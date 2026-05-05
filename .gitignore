@@ -32,6 +32,12 @@ secrets/
 # Caché
 .cache/
 
+# Entornos virtuales de Python
+.venv/
+venv/
+__pycache__/
+*.pyc
+
 # Archivos personales que no van al repo público
 notas-privadas/
 borradores/
