@@ -1,0 +1,37 @@
+# Sistema operativo
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editores
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.iml
+*.bak
+*.tmp
+*.temp
+
+# Logs
+*.log
+npm-debug.log*
+
+# Variables de entorno y secretos
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+secrets/
+
+# Claude Code local (preferencias del usuario, no compartibles)
+.claude/settings.local.json
+
+# Caché
+.cache/
+
+# Archivos personales que no van al repo público
+notas-privadas/
+borradores/

@@ -1,0 +1,14 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "echo '=== ESTADO ACTUAL ==='; cat progreso/estado-actual.md 2>/dev/null || echo '(estado-actual.md no encontrado)'; echo; echo '=== RED CONCEPTUAL ==='; cat progreso/red-conceptual.md 2>/dev/null || echo '(red-conceptual.md no encontrado)'; echo; echo '=== INTUICIONES DEBILES ==='; cat progreso/intuiciones-debiles.md 2>/dev/null || echo '(intuiciones-debiles.md no encontrado)'"
+          }
+        ]
+      }
+    ]
+  }
+}
