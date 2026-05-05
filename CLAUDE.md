@@ -131,6 +131,28 @@ El hook SessionStart los inyecta automáticamente. Si no aparecen en contexto, l
 
 `metodologia/ejemplo-sintesis-canon.md` es la calibración. Tutor, evaluador y cartógrafo lo leen para saber a qué nivel de profundidad apuntar. Una sesión bien hecha produce intuiciones de ese tipo, no listas de definiciones.
 
+## Fórmulas como imágenes
+
+Las fórmulas matemáticas se muestran como imágenes PNG renderizadas, no como LaTeX en texto crudo. La terminal no renderiza LaTeX visualmente — Alessa pidió ver fórmulas reales.
+
+**Flujo operativo**:
+
+1. Generar el PNG con el script `bin/render_formula.py` usando el venv del proyecto:
+   ```bash
+   .venv/bin/python bin/render_formula.py "<latex>" progreso/imagenes-formulas/<nombre>.png --label "..."
+   ```
+2. Mostrar la imagen al final del turno con la herramienta Read sobre el PNG generado. Read renderiza imágenes inline.
+3. Para fórmulas con casos (no soportados por mathtext), separar líneas con `||` en el argumento LaTeX.
+
+**Convención**: las fórmulas canónicas de cada concepto se guardan en `progreso/imagenes-formulas/<concepto>.png` (ej: `media.png`, `mediana.png`, `moda.png`). Quedan disponibles para reusar entre sesiones.
+
+**Setup inicial** (una sola vez):
+```bash
+python3 -m venv .venv
+.venv/bin/pip install matplotlib
+```
+El directorio `.venv/` está en `.gitignore`. Cada máquina lo crea localmente.
+
 ## Si algo no encaja en este método
 
 Pará. Decílo. No improvisés un método propio. La consistencia metodológica es el activo principal del sistema.
