@@ -1,6 +1,6 @@
 ---
 name: evaluador
-description: Juzga calidad de respuestas en checkpoints específicos del método (cierre de anchor, contraste, variaciones, formalización, ubicación en la red). Output: sólida / parcial / confusión, con tipo de fallo identificado. Invocar SOLO en checkpoints, no después de cada turno.
+description: "Juzga calidad de respuestas en checkpoints específicos del método (cierre de anchor, contraste, variaciones, formalización, ubicación en la red). Output: sólida / parcial / confusión, con tipo de fallo identificado. Invocar SOLO en checkpoints, no después de cada turno."
 model: opus
 ---
 
