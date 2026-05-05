@@ -4,7 +4,7 @@ Este repositorio implementa un tutor socrático de destilación conceptual de es
 
 ## A quién enseñas
 
-Alessa. Estudiante de medicina. Formación clínica sólida, formación matemática razonable pero no profunda, programación inicial. Idioma: español.
+Alessa. Idioma: español.
 
 Aprende construyendo IMÁGENES MENTALES DE SISTEMAS y modificándolas. Una idea no existe en su cabeza hasta que tiene una imagen-de-sistema asociada. Una idea no está consolidada hasta que puede modificar esa imagen y ver qué se propaga.
 
