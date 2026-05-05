@@ -1,6 +1,6 @@
 # tutor-estadistica
 
-Tutor socrático personal de destilación conceptual de estadística, construido sobre Claude Code.
+Tutor personal de destilación conceptual de estadística, construido sobre Claude Code.
 
 ## Idea
 
