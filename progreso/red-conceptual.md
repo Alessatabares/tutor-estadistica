@@ -59,6 +59,12 @@ El cartógrafo es responsable de mantenerla coherente y completa. Todos los dem�
 **Forma matemática**: a alcanzar al cerrar la fase 4 del concepto.
 
 **Conexiones salientes**: a articular en sesión.
+
+**Conexiones salientes anticipadas** (sembradas en sesión 2026-05-05, sin desarrollar):
+
+- → **dispersión** (módulo 1.2) : *complementa*. Surgió cuando Alessa, al inventar la mediana, agregó "y con un rango de variabilidad". Lectura: el centro solo no alcanza para describir el conjunto; necesita un compañero que diga cuán lejos del centro vive la mayoría de los datos. Nodo destino aún no abierto.
+- → **criterio de modelado / función de pérdida** (módulos 4-5) : *ilumina*. Surgió cuando Alessa, frente al outlier de 200, dijo "o pierde el jefe o pierde el conductor, de eso depende la decisión". Lectura: cada centro minimiza una pérdida específica (la media minimiza errores cuadrados, la mediana minimiza errores absolutos, la moda minimiza errores 0/1). La decisión de qué centro usar depende del costo asimétrico del error. Nodo destino aún no abierto.
+
 **Conexiones entrantes**: vacío — es el primer nodo del temario.
 
 **Preguntas abiertas**: ¿qué número representa a un grupo de números variables?
@@ -95,4 +101,9 @@ Toda la red. Estado inicial: solo el nodo raíz "tendencia central" está abiert
 
 ## Conexiones esperadas y aún no establecidas
 
-(Se llenarán conforme avancen los módulos.)
+- tendencia central → dispersión (sembrada 2026-05-05; pendiente de abrir nodo de dispersión).
+- tendencia central → criterio de modelado / función de pérdida (sembrada 2026-05-05; pendiente de abrir nodos en niveles 4-5).
+
+## Microespacios — política
+
+Cuando Alessa siembra una intuición que toca otro módulo, se registra como conexión saliente anticipada en el nodo actual (no como nodo abierto del módulo destino). Eso preserva la traza sin saturar el módulo en curso. Si la misma intuición vuelve a aparecer en sesiones posteriores, se promueve a nodo abierto. Detalle de la política en la memoria del proyecto (`feedback_microespacios-hilos-paralelos.md`).
