@@ -49,19 +49,32 @@ El cartógrafo es responsable de mantenerla coherente y completa. Todos los dem�
 
 ### Nodo: tendencia central
 
-**Estado**: abierto
+**Estado**: consolidado-parcial (intuición sólida; parcial respecto al canon en dimensión temporal/sistémica)
 **Módulo**: 1.1
 **Nivel**: 1
-**Fecha de apertura**: pendiente — primera sesión.
+**Fecha de apertura**: 2026-05-05
+**Fecha de consolidación**: 2026-05-05
 
-**Sistema-anchor que funcionó**: a definir en sesión.
-**Síntesis verbal**: a construir.
-**Forma matemática**: a alcanzar al cerrar la fase 4 del concepto.
+**Sistema-anchor que funcionó**: El bus con recorridos cabecera A → cabecera B → cabecera A. Cada vuelta dura distinto por causas internas (peso de pasajeros, ocupación, accidentes, semáforos, posición del estacionamiento). Cada vuelta termina y produce un número. La planilla acumula la lista. El gerente la abre y necesita resumirla.
 
-**Conexiones salientes**: a articular en sesión.
-**Conexiones entrantes**: vacío — es el primer nodo del temario.
+**Síntesis verbal**: "El promedio reparte. La mediana centra por posición. La moda lee la repetición. Cuál usás depende de qué pregunta hacés y de quién paga el error."
 
-**Preguntas abiertas**: ¿qué número representa a un grupo de números variables?
+**Forma matemática**:
+- Media = Σx/N → "el reparto que conserva el total y distribuye la carga en partes iguales"
+- Mediana = valor que parte la masa en dos → "centra por posición; resiste extremos porque la posición del valor extremo no cambia"
+- Moda = arg max f(x) → "lee dónde se concentra la masa por frecuencia; ciega al outlier, ciega también cuando todos los valores son distintos"
+
+**Conexiones salientes**:
+- → dispersión (módulo 1.2) : complementa — Alessa anticipó "un rango de variabilidad" al inventar la mediana; el centro solo no describe el conjunto
+- → criterio de modelado / función de pérdida (módulos 4-5) : ilumina — "o pierde el jefe o pierde el conductor, de eso depende la decisión"; la elección del centro depende de quién paga el error
+
+**Conexiones entrantes**:
+- vacío — es el primer nodo del temario
+
+**Preguntas abiertas**:
+- "Tres tipos de estabilidad" (instante / tiempo / supervivencia) — Alessa leyó los tres centros por sensibilidad a la composición del conjunto, no por tipo de estabilidad. Lectura propia legítima, pero falta la dimensión temporal/sistémica. Retomar en módulo 1.2 o en revisión de 1.1.
+- "Al azar = expectativa = media" — no apareció. Retomar cuando llegue probabilidad.
+- "El concepto es previo al modelo" — no apareció explícito. Retomar en módulo de modelado.
 
 ---
 
@@ -87,12 +100,19 @@ El cartógrafo es responsable de mantenerla coherente y completa. Todos los dem�
 
 ## Conceptos huérfanos
 
-(Ninguno todavía.)
+Ninguno. El nodo "tendencia central" tiene dos conexiones salientes articuladas por Alessa en sesión.
 
 ## Ramas poco desarrolladas
 
-Toda la red. Estado inicial: solo el nodo raíz "tendencia central" está abierto.
+- Nivel 1 completo en nodos: solo tendencia central. Dispersión (1.2) aún sin abrir.
+- Niveles 2-5: sin nodos abiertos.
 
 ## Conexiones esperadas y aún no establecidas
 
-(Se llenarán conforme avancen los módulos.)
+- tendencia central → dispersión (1.2) : conexión sembrada, nodo receptor aún no abierto.
+- tendencia central → criterio de modelado / función de pérdida (4-5) : conexión sembrada, nodo receptor aún no abierto.
+- tendencia central ← probabilidad/expectativa : no articulada todavía. Aparecerá cuando llegue módulo de probabilidad.
+
+## Nota sobre conexiones pendientes en ramas feat
+
+Las conexiones salientes de "tendencia central" hacia dispersión y función de pérdida están detalladas en la rama `feat/microespacios-tendencia-central`. Este archivo solo registra que las conexiones existen y fueron articuladas en sesión. El detalle ampliado se mergeará por separado.

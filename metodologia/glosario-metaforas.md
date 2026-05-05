@@ -25,7 +25,14 @@ Un sistema-anchor pasa de instancia (`imagenes-canon.md`) a patrón (este archiv
 
 # Patrones canonizados
 
-(Vacío al inicio. El cartógrafo agrega entradas conforme aparecen patrones reusables.)
+---
+
+## "Tres lentes sobre el mismo dato"
+
+**Estructura del sistema**: Una misma realidad (un conjunto de números) observada desde tres preguntas distintas que producen tres respuestas distintas. Las respuestas no se contradicen: cada una es correcta para su pregunta. El encuadre define el resultado.
+**Para qué tipo de concepto funciona**: Conceptos donde la elección del estimador o el modelo depende de quién pregunta y qué quiere saber. Especialmente útil cuando hay múltiples formas "correctas" de resumir algo.
+**Por qué funciona para Alessa**: Alessa piensa en relaciones, no en piezas. Ver que tres números distintos emergen de la misma planilla, según quién la abra, activa inmediatamente la pregunta "¿de qué depende cuál usar?" — que es exactamente la pregunta que genera criterio de modelado.
+**Instancia(s) específica(s) en uso**: El bus A-B-A, módulo 1.1 — gerente vs. conductor vs. pasajero hacen preguntas distintas sobre la misma planilla de duraciones. Ver `progreso/imagenes-canon.md`.
 
 ---
 
@@ -36,5 +43,5 @@ Estos son patrones que probablemente aparezcan, pero no se agregan formalmente h
 - **"Reparto bajo restricción"**: pastel finito, N personas, conservación del total. Útil para promedios, varianzas, cualquier concepto que opere sobre un total que se distribuye.
 - **"Señal en ruido"**: emisión clara + interferencia variable. Útil para conceptos de inferencia, error de medición, detección.
 - **"Ecosistema con feedback"**: presa-depredador, flujos cíclicos. Útil para conceptos que requieren ver retroalimentación.
-- **"Tres lentes sobre el mismo dato"**: misma realidad observada con tres preguntas distintas, tres respuestas distintas. Útil para conceptos donde el encuadre define el resultado (ej. tendencia central).
 - **"Sistema bajo transformación"**: aplicar una operación al sistema y ver qué se conserva. Útil para invariantes, escala, robustez.
+- **"Objetos con peso"**: los datos no son puntos abstractos sino objetos con masa/peso. Introducido por Alessa en módulo 1.1 ("cada recorrido como una masa de pura magnitud"). Potencialmente reusable para varianza, ponderación, distribuciones de probabilidad. Canonizar cuando aparezca en un segundo módulo.
