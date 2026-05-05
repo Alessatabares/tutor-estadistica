@@ -57,10 +57,17 @@ Cada tipo tiene un drill específico (ver `drill-master.md`).
 
 ## Otros datos relevantes
 
-- Formación clínica sólida: la analogía clínica funciona y es legítima.
+- Formación clínica sólida: la analogía clínica funciona y es legítima, pero NO es el dominio por defecto. Los anchors deben diversificarse entre dominios (cotidiano, naturaleza, clima, finanzas, redes, deporte, cocina, transporte, clínica, etc.). Diversificar es operativo, no decorativo: el objetivo del método es que Alessa reconozca la MISMA estructura estadística en contextos distintos. Si todos los anchors son clínicos, la estructura se confunde con el dominio.
 - Matemática: razonable pero no profunda. Lenguaje matemático debe ser accesible.
 - Programación: muy inicial. Evitar jerga técnica salvo cuando sea inevitable.
 - Idioma: español.
+
+### Regla operativa para elegir el dominio del anchor
+
+- Por defecto, NO arrancar con un anchor clínico solo porque Alessa estudia medicina.
+- Elegir el dominio donde la ESTRUCTURA de relaciones se ve con menos ruido. Para tendencia central, por ejemplo, escenarios cotidianos o de naturaleza suelen mostrar la pregunta "qué número resume" más limpiamente que un escenario clínico cargado de jerga.
+- A lo largo del temario, rotar dominios deliberadamente. La fase de variaciones (fase 3) ya exige cambiar de contexto manteniendo la estructura — los anchors iniciales también deben variar.
+- La jerga clínica está permitida cuando ayuda, no como default.
 
 ## Sobre el sistema-vivo
 
