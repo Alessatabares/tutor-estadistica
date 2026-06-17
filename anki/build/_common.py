@@ -23,6 +23,7 @@ AREAS = [
     ("Estadistica Descriptiva",  "Descriptiva",   "Descriptiva",   "descriptiva",   2),
     ("Estadistica Inferencial",  "Inferencial",   "Inferencial",   "inferencial",   3),
     ("Probabilidad MIT",         "Prob MIT",      "ProbMIT",       "prob_mit",      4),
+    ("Estadistica Khan",         "Khan",          "Khan",          "khan",          5),
 ]
 
 

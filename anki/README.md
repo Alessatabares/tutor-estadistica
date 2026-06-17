@@ -73,5 +73,13 @@ python build/build_contraste.py
   variables aleatorias discretas y continuas (PMF/PDF/CDF, esperanza, varianza, distribuciones
   derivadas, covarianza/correlación, esperanza/varianza iteradas), inferencia (bayesiana, MAP,
   LMS/LLMS, Markov/Chebyshev, WLLN, TLC, MLE) y procesos (Bernoulli, Poisson, cadenas de Markov).
+- **Estadistica Khan** — el curso *Statistics and Probability* de Khan Academy (16 unidades, estilo
+  AP Statistics): datos categóricos (tablas de doble entrada, marginal/condicional), mostrar y
+  resumir cuantitativos (histograma, media/mediana, IQR, varianza n−1, boxplot, 1.5×IQR), modelar
+  (percentil, z-score, densidad, normal, regla empírica), bivariados (scatterplot, r, mínimos
+  cuadrados, residuales, R²), diseño de estudios, probabilidad, conteo, variables aleatorias,
+  distribuciones muestrales (SE, TLC), intervalos de confianza, tests de hipótesis (p, errores I/II,
+  potencia), inferencia de dos muestras, chi-cuadrado (GOF/independencia/homogeneidad), regresión
+  avanzada y ANOVA.
 
-Total actual: **120 tarjetas** — Capa 1: 86 (30 Eje Clínico + 56 Integrador) · Capa 2: 34 Contraste.
+Total actual: **186 tarjetas** — Capa 1: 132 (45 Eje Clínico + 87 Integrador) · Capa 2: 54 Contraste.
