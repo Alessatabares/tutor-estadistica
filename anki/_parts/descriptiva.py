@@ -68,3 +68,25 @@ ESTACIONES = [
      "antes de gritar 'causa', busca la confusora que mueve a las dos"),
   ]),
 ]
+
+# CAPA 2 - CONTRASTE: discriminar conceptos cercanos + supuestos/fallos.
+# (tema, planteamiento, resolucion)
+CONTRASTES = [
+  ("Media vs Mediana",
+   "Reportas la estancia hospitalaria, muy sesgada a la derecha por unos pocos pacientes con estancias larguísimas. ¿Media o mediana? ¿Por qué?",
+   "Mediana. La media la arrastran los outliers de la cola larga; la mediana parte la masa en dos y resiste extremos. "
+   "Regla de bolsillo: si la media es mucho mayor que la mediana, sospecha sesgo a la derecha."),
+  ("Pearson vs Spearman",
+   "Quieres correlacionar dos variables, pero la relación es curva y hay outliers. ¿Cuál usas?",
+   "Spearman. Pearson mide relación LINEAL y se rompe con outliers; Spearman usa rangos, capta relaciones "
+   "monótonas no lineales y es robusta. Pearson solo si la nube es recta, continua y sin outliers fuertes."),
+  ("Varianza vs Desviación estándar",
+   "Miden lo mismo (dispersión). ¿Por qué se reporta la desviación estándar y no la varianza?",
+   "La varianza está en unidades AL CUADRADO (mmHg², años²): no se interpreta directo. "
+   "La desviación estándar es su raíz, en las MISMAS unidades del dato, así que sí se lee: "
+   "'un paciente típico se aleja ±X de la media'."),
+  ("Correlación vs Causación",
+   "El consumo de helado y los ahogamientos suben juntos (r alto). ¿El helado causa los ahogamientos?",
+   "No. Hay una confusora (el calor del verano) que mueve a las dos. Una correlación alta solo dice "
+   "'varían juntas', no 'una causa la otra'. Antes de afirmar causa, busca la tercera variable."),
+]

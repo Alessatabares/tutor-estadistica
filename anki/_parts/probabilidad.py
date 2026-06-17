@@ -114,3 +114,33 @@ ESTACIONES = [
      "la varianza es el hilo que cose probabilidad, descriptiva e inferencia"),
   ]),
 ]
+
+# CAPA 2 - CONTRASTE: discriminar conceptos cercanos + supuestos/fallos.
+# (tema, planteamiento, resolucion)
+CONTRASTES = [
+  ("Sensibilidad vs Especificidad",
+   "¿Cuál te sirve para DESCARTAR, cuál para CONFIRMAR, y de qué NO dependen?",
+   "Sensibilidad: detecta enfermos; si es alta y sale NEGATIVA, descartas (SnNOut). "
+   "Especificidad: identifica sanos; si es alta y sale POSITIVA, confirmas (SpPIn). "
+   "Las dos son propiedades fijas de la prueba: NO dependen de la prevalencia (eso es el VPP/VPN)."),
+  ("Sensibilidad/Especificidad vs VPP/VPN",
+   "Las cuatro describen una prueba diagnóstica. ¿Cuáles cambian con la prevalencia y cuáles no?",
+   "Sensibilidad y especificidad son intrínsecas a la prueba: no cambian con la prevalencia. "
+   "VPP y VPN sí dependen de la prevalencia: en enfermedad rara el VPP cae aunque la prueba sea buena. "
+   "Por eso un positivo en tamiz poblacional suele ser falso."),
+  ("Binomial vs Poisson",
+   "Las dos cuentan eventos. ¿Cuándo cada una?",
+   "Binomial: número FIJO de intentos sí/no con la misma p (cuántos de 20 pacientes responden). "
+   "Poisson: eventos raros por intervalo de tiempo/espacio, sin tope fijo (ingresos por hora). "
+   "Pista: ¿hay un n claro de intentos? Binomial. ¿Cuentas ocurrencias por unidad de tiempo? Poisson."),
+  ("Independientes vs Mutuamente excluyentes (la trampa)",
+   "Dos eventos que no pueden ocurrir juntos, ¿son independientes?",
+   "NO. Si son mutuamente excluyentes y ambos posibles, son DEPENDIENTES: saber que ocurrió A te dice "
+   "que B no ocurrió (cambia su probabilidad a cero). Excluyente = no coexisten; independiente = no se informan. "
+   "Es uno de los errores más comunes."),
+  ("Prior vs Posterior",
+   "En Bayes, ¿qué distingue al prior del posterior?",
+   "Prior: lo que creías ANTES de la prueba (la prevalencia, tu creencia base). "
+   "Posterior: lo que crees DESPUÉS de incorporar la evidencia (el VPP es un posterior). "
+   "Bayes es la máquina que convierte prior + evidencia en posterior."),
+]

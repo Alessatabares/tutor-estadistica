@@ -150,3 +150,48 @@ ESTACIONES = [
      "fijos: un solo efecto real; aleatorios: cada estudio mide un efecto algo distinto"),
   ]),
 ]
+
+# CAPA 2 - CONTRASTE: discriminar conceptos cercanos + supuestos/fallos.
+# (tema, planteamiento, resolucion)
+CONTRASTES = [
+  ("SD vs SE",
+   "Tienes la desviación estándar de tus datos y el error estándar de tu media. ¿Qué describe cada uno?",
+   "SD describe cuánto varían los DATOS entre sí (no cambia mucho con n). "
+   "SE describe cuánto varía tu ESTIMACIÓN de la media de muestra a muestra, y se encoge con n: SE = SD/√n. "
+   "Reportar SD cuando querías SE (o al revés) es un error clásico."),
+  ("Error tipo I vs tipo II",
+   "¿Qué afirmas mal en cada uno y qué los controla?",
+   "Tipo I (α): rechazas H₀ siendo cierta = gritas 'hay efecto' y no lo hay (falso positivo). "
+   "Tipo II (β): no rechazas H₀ siendo falsa = te pierdes un efecto real (falso negativo). "
+   "La potencia (1−β) sube con más n y con efectos más grandes."),
+  ("Valor p: lo que ES vs lo que NO es",
+   "Sale p = 0.03. ¿Qué significa exactamente y qué NO significa?",
+   "ES: la probabilidad de ver datos así de extremos SI H₀ fuera cierta. "
+   "NO es: la probabilidad de que H₀ sea falsa, ni la probabilidad de equivocarte, ni el tamaño del efecto. "
+   "Un p chico dice 'mis datos son raros bajo H₀', no 'el efecto es grande o importante'."),
+  ("t de Student vs Mann-Whitney",
+   "Comparas el colesterol entre dos grupos, pero está muy sesgado y con outliers. ¿Cuál prueba?",
+   "Mann-Whitney. La t exige normalidad (y varianzas parecidas); con sesgo/outliers se viola el supuesto. "
+   "La no paramétrica compara rangos en vez de medias y no asume normalidad."),
+  ("Elegir prueba: tabla 2×2",
+   "Comparas la mortalidad (sí/no) entre tratamiento y placebo. ¿Qué prueba, y por qué NO la t?",
+   "Chi-cuadrada (o Fisher si alguna frecuencia esperada es &lt;5). Son variables CATEGÓRICAS en una 2×2, "
+   "no medias continuas, así que la t de Student no aplica. La 2×2 es el nodo de chi-cuadrada, sens/spec y el OR."),
+  ("Regresión lineal vs logística",
+   "¿Qué decide si uso una u otra?",
+   "El tipo de DESENLACE. Continuo (presión, peso) → lineal: el coeficiente es 'cuánto cambia Y por unidad de X'. "
+   "Binario (vivo/muerto) → logística: el coeficiente se lee como ODDS RATIO. La logística modela una probabilidad."),
+  ("Efectos fijos vs aleatorios (meta-análisis)",
+   "Al combinar estudios, ¿qué supuesto los distingue y cómo eliges?",
+   "Fijos: existe UN único efecto verdadero común; las diferencias entre estudios son solo azar. "
+   "Aleatorios: cada estudio mide un efecto algo distinto (hay una distribución de efectos). "
+   "Si la heterogeneidad (I²) es alta, usa aleatorios."),
+  ("Significancia vs Relevancia clínica",
+   "Con n = 50.000 sale p &lt; 0.001 pero el efecto es bajar la presión 0.4 mmHg. ¿Importa?",
+   "Significativo no es lo mismo que relevante. El p depende del n: con n enorme casi todo sale significativo. "
+   "El TAMAÑO DE EFECTO dice si importa clínicamente. Mantén separadas '¿es real?' (p) y '¿importa?' (efecto)."),
+  ("IC vs Prueba de hipótesis",
+   "¿Por qué mirar el IC del 95% te ahorra la prueba —y da más?",
+   "Son dos vistas de lo mismo: si el IC del 95% NO incluye el valor nulo, entonces p &lt; 0.05. "
+   "Pero el IC da MÁS: muestra el tamaño del efecto y su precisión, no solo un sí/no de significancia."),
+]
