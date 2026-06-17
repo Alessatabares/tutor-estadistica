@@ -113,6 +113,6 @@ Ninguno. El nodo "tendencia central" tiene dos conexiones salientes articuladas 
 - tendencia central → criterio de modelado / función de pérdida (4-5) : conexión sembrada, nodo receptor aún no abierto.
 - tendencia central ← probabilidad/expectativa : no articulada todavía. Aparecerá cuando llegue módulo de probabilidad.
 
-## Nota sobre conexiones pendientes en ramas feat
+## Microespacios — política
 
-Las conexiones salientes de "tendencia central" hacia dispersión y función de pérdida están detalladas en la rama `feat/microespacios-tendencia-central`. Este archivo solo registra que las conexiones existen y fueron articuladas en sesión. El detalle ampliado se mergeará por separado.
+Cuando Alessa siembra una intuición que toca otro módulo, se registra como conexión saliente anticipada en el nodo actual (no como nodo abierto del módulo destino). Eso preserva la traza sin saturar el módulo en curso. Si la misma intuición vuelve a aparecer en sesiones posteriores, se promueve a nodo abierto. Detalle de la política en la memoria del proyecto (`feedback_microespacios-hilos-paralelos.md`).

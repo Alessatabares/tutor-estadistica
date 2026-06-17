@@ -57,9 +57,6 @@ Cada tipo tiene un drill específico (ver `drill-master.md`).
 
 ## Otros datos relevantes
 
-- Formación clínica sólida: la analogía clínica funciona y es legítima.
-- Matemática: razonable pero no profunda. Lenguaje matemático debe ser accesible.
-- Programación: muy inicial. Evitar jerga técnica salvo cuando sea inevitable.
 - Idioma: español.
 
 ## Sobre el sistema-vivo

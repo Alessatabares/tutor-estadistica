@@ -1,0 +1,197 @@
+# -*- coding: utf-8 -*-
+NAME = "Estadistica Inferencial"
+
+# EJE CLINICO: del PROBLEMA al concepto.
+EJES = [
+  ("Estudié 80 pacientes, ¿qué puedo afirmar de todos los pacientes?", [
+    ("Tomar un subconjunto que represente a la población",
+     "Muestreo"),
+    ("La distribución de un estadístico (p.ej. la media) entre muestras",
+     "Distribución muestral"),
+    ("Cuánto varía mi ESTIMACIÓN de muestra a muestra",
+     "Error estándar (SE = SD/√n)"),
+    ("El rango plausible donde está el valor real de la población",
+     "Intervalo de confianza (IC) — herramienta: scipy.stats"),
+  ]),
+  ("El grupo tratado mejoró más, ¿es real o pura casualidad?", [
+    ("La hipótesis de 'no hay efecto / no hay diferencia'",
+     "Hipótesis nula (H₀)"),
+    ("La probabilidad de datos así de extremos SI H₀ fuera cierta",
+     "Valor p"),
+    ("El umbral con que decido rechazar H₀ (típico 0.05)",
+     "Nivel de significancia (α)"),
+    ("Rechazar H₀ cuando en realidad era cierta (falso positivo)",
+     "Error tipo I"),
+    ("No rechazar H₀ cuando era falsa (falso negativo)",
+     "Error tipo II"),
+    ("La capacidad de detectar un efecto que sí existe",
+     "Potencia (1 − β)"),
+  ]),
+  ("¿Qué prueba uso para comparar mis grupos?", [
+    ("Comparar las medias de dos grupos (continua, normal)",
+     "t de Student"),
+    ("Comparar las medias de 3 o más grupos",
+     "ANOVA"),
+    ("Comparar proporciones / categóricas en una tabla 2×2",
+     "Chi-cuadrada"),
+    ("Comparar dos grupos cuando NO se cumple normalidad",
+     "Mann-Whitney (no paramétrica)"),
+    ("Decidir entre paramétrico y no paramétrico",
+     "Verificar supuestos (normalidad, varianzas iguales) — scipy.stats, pingouin"),
+  ]),
+  ("Quiero saber qué factores predicen un desenlace (p.ej. mortalidad)", [
+    ("Predecir un desenlace continuo a partir de variables",
+     "Regresión lineal"),
+    ("Predecir un desenlace binario (vivo/muerto, sí/no)",
+     "Regresión logística"),
+    ("La medida de efecto que entrega la logística",
+     "Odds ratio (OR)"),
+    ("Cuánta varianza del desenlace explica el modelo",
+     "R²"),
+    ("Quitar el efecto de una confusora del estimado",
+     "Ajuste / control por covariables"),
+    ("Revisar que el modelo cumple sus supuestos",
+     "Análisis de residuales — herramienta: statsmodels"),
+  ]),
+  ("Tengo varios estudios sobre lo mismo, ¿cómo los combino? (meta-análisis)", [
+    ("Una medida estandarizada de la magnitud del efecto",
+     "Tamaño de efecto"),
+    ("Dar más peso a los estudios más precisos",
+     "Ponderación por inverso de la varianza"),
+    ("Asumir un único efecto verdadero común a todos",
+     "Modelo de efectos fijos"),
+    ("Asumir una distribución de efectos entre estudios",
+     "Modelo de efectos aleatorios"),
+    ("Cuánto varían los resultados entre estudios",
+     "Heterogeneidad (Q, I²)"),
+    ("Ver el efecto y su IC estudio por estudio",
+     "Forest plot"),
+    ("Detectar sesgo de publicación",
+     "Funnel plot (nota: metafor de R es el estándar de oro)"),
+  ]),
+  ("(radar) Capas siguientes, cuando un problema te empuje", [
+    ("Tiempo hasta que ocurre un evento (supervivencia)",
+     "Kaplan-Meier / Cox (lifelines)"),
+    ("Actualizar priors con datos de forma formal",
+     "Estadística bayesiana (PyMC)"),
+    ("Muchas pruebas a la vez inflan los falsos positivos",
+     "Corrección por comparaciones múltiples / p-hacking"),
+  ]),
+]
+
+# INTEGRADOR: de las SENALES concretas al concepto + tip verbalizable.
+ESTACIONES = [
+  ("ESTIMACIÓN Y ERROR", [
+    ("Describe cuánto varía mi ESTIMACIÓN, no los datos",
+     "Se encoge cuando n crece (se divide entre √n)",
+     "SE = SD / √n",
+     "Error estándar (SE)",
+     "la SD describe los datos; el SE describe la confianza en mi estimación"),
+    ("Es el rango plausible del valor real de la población",
+     "Más n lo hace más estrecho",
+     "Si NO incluye el valor nulo, entonces p &lt; 0.05",
+     "Intervalo de confianza",
+     "el IC y la prueba de hipótesis son la misma cosa vista de dos formas"),
+    ("Confundirlos es de los errores más comunes",
+     "Uno describe los datos, el otro la estimación",
+     "Se relacionan por SE = SD/√n",
+     "SD vs SE",
+     "SD = dispersión de los datos; SE = dispersión de la media; parientes por √n"),
+  ]),
+  ("LA TRAMPA DEL VALOR P", [
+    ("Es P(datos así de extremos | H₀ cierta)",
+     "NO es la probabilidad de que H₀ sea falsa",
+     "NO mide el tamaño ni la importancia del efecto",
+     "Valor p",
+     "el p responde '¿qué tan raros son mis datos si no hubiera efecto?', no '¿qué tan probable es que me equivoque?'"),
+    ("Rechazo H₀ cuando en realidad era cierta",
+     "Es un falso positivo",
+     "Su probabilidad es α (típico 0.05)",
+     "Error tipo I",
+     "tipo I = grito 'hay efecto' cuando no lo hay"),
+    ("Un p significativo con n enorme puede ser trivial",
+     "Significancia estadística ≠ relevancia clínica",
+     "El tamaño de efecto dice si IMPORTA",
+     "Significancia vs relevancia",
+     "separa siempre '¿es real?' (p) de '¿importa?' (tamaño de efecto)"),
+  ]),
+  ("ELEGIR LA PRUEBA", [
+    ("Desenlace continuo, dos grupos, datos normales",
+     "Compara dos medias",
+     "Si falla la normalidad, usa Mann-Whitney",
+     "t de Student",
+     "t para comparar dos medias continuas y normales"),
+    ("Variables categóricas en una tabla 2×2",
+     "Compara frecuencias observadas vs esperadas",
+     "Es el nodo central de la tabla 2×2",
+     "Chi-cuadrada",
+     "chi-cuadrada vive en la tabla 2×2, igual que sens/spec y el odds ratio"),
+    ("Desenlace binario (vivo/muerto)",
+     "Su coeficiente se lee como odds ratio",
+     "Modela una probabilidad",
+     "Regresión logística",
+     "la logística predice un sí/no y entrega odds ratios clínicos"),
+  ]),
+  ("COMBINAR ESTUDIOS (META-ANÁLISIS)", [
+    ("Los estudios más precisos pesan más",
+     "El peso es el INVERSO de la varianza",
+     "La misma varianza de probabilidad, ahora como peso",
+     "Ponderación por inverso de varianza",
+     "el estudio con menos varianza (más preciso) manda más en el promedio combinado"),
+    ("Mide cuánto discrepan los estudios entre sí",
+     "Un I² alto significa que no concuerdan",
+     "Decide entre efectos fijos y aleatorios",
+     "Heterogeneidad (I²)",
+     "I² alto: los estudios cuentan historias distintas → usa efectos aleatorios"),
+    ("Asume un único efecto verdadero común a todos",
+     "Se contrasta con el modelo de efectos aleatorios",
+     "Se elige según la heterogeneidad",
+     "Efectos fijos vs aleatorios",
+     "fijos: un solo efecto real; aleatorios: cada estudio mide un efecto algo distinto"),
+  ]),
+]
+
+# CAPA 2 - CONTRASTE: discriminar conceptos cercanos + supuestos/fallos.
+# (tema, planteamiento, resolucion)
+CONTRASTES = [
+  ("SD vs SE",
+   "Tienes la desviación estándar de tus datos y el error estándar de tu media. ¿Qué describe cada uno?",
+   "SD describe cuánto varían los DATOS entre sí (no cambia mucho con n). "
+   "SE describe cuánto varía tu ESTIMACIÓN de la media de muestra a muestra, y se encoge con n: SE = SD/√n. "
+   "Reportar SD cuando querías SE (o al revés) es un error clásico."),
+  ("Error tipo I vs tipo II",
+   "¿Qué afirmas mal en cada uno y qué los controla?",
+   "Tipo I (α): rechazas H₀ siendo cierta = gritas 'hay efecto' y no lo hay (falso positivo). "
+   "Tipo II (β): no rechazas H₀ siendo falsa = te pierdes un efecto real (falso negativo). "
+   "La potencia (1−β) sube con más n y con efectos más grandes."),
+  ("Valor p: lo que ES vs lo que NO es",
+   "Sale p = 0.03. ¿Qué significa exactamente y qué NO significa?",
+   "ES: la probabilidad de ver datos así de extremos SI H₀ fuera cierta. "
+   "NO es: la probabilidad de que H₀ sea falsa, ni la probabilidad de equivocarte, ni el tamaño del efecto. "
+   "Un p chico dice 'mis datos son raros bajo H₀', no 'el efecto es grande o importante'."),
+  ("t de Student vs Mann-Whitney",
+   "Comparas el colesterol entre dos grupos, pero está muy sesgado y con outliers. ¿Cuál prueba?",
+   "Mann-Whitney. La t exige normalidad (y varianzas parecidas); con sesgo/outliers se viola el supuesto. "
+   "La no paramétrica compara rangos en vez de medias y no asume normalidad."),
+  ("Elegir prueba: tabla 2×2",
+   "Comparas la mortalidad (sí/no) entre tratamiento y placebo. ¿Qué prueba, y por qué NO la t?",
+   "Chi-cuadrada (o Fisher si alguna frecuencia esperada es &lt;5). Son variables CATEGÓRICAS en una 2×2, "
+   "no medias continuas, así que la t de Student no aplica. La 2×2 es el nodo de chi-cuadrada, sens/spec y el OR."),
+  ("Regresión lineal vs logística",
+   "¿Qué decide si uso una u otra?",
+   "El tipo de DESENLACE. Continuo (presión, peso) → lineal: el coeficiente es 'cuánto cambia Y por unidad de X'. "
+   "Binario (vivo/muerto) → logística: el coeficiente se lee como ODDS RATIO. La logística modela una probabilidad."),
+  ("Efectos fijos vs aleatorios (meta-análisis)",
+   "Al combinar estudios, ¿qué supuesto los distingue y cómo eliges?",
+   "Fijos: existe UN único efecto verdadero común; las diferencias entre estudios son solo azar. "
+   "Aleatorios: cada estudio mide un efecto algo distinto (hay una distribución de efectos). "
+   "Si la heterogeneidad (I²) es alta, usa aleatorios."),
+  ("Significancia vs Relevancia clínica",
+   "Con n = 50.000 sale p &lt; 0.001 pero el efecto es bajar la presión 0.4 mmHg. ¿Importa?",
+   "Significativo no es lo mismo que relevante. El p depende del n: con n enorme casi todo sale significativo. "
+   "El TAMAÑO DE EFECTO dice si importa clínicamente. Mantén separadas '¿es real?' (p) y '¿importa?' (efecto)."),
+  ("IC vs Prueba de hipótesis",
+   "¿Por qué mirar el IC del 95% te ahorra la prueba —y da más?",
+   "Son dos vistas de lo mismo: si el IC del 95% NO incluye el valor nulo, entonces p &lt; 0.05. "
+   "Pero el IC da MÁS: muestra el tamaño del efecto y su precisión, no solo un sí/no de significancia."),
+]
