@@ -22,4 +22,22 @@ Diferencia con `metodologia/glosario-metaforas.md`: ese es el catálogo de PATRO
 
 # Imágenes canon
 
-(Vacío al inicio. El cartógrafo agrega entradas tras cada `/cierre` cuando un sistema-anchor produjo insight claro.)
+---
+
+## Tendencia central — El bus A-B-A
+
+**Sistema-anchor**: El bus haciendo recorridos cabecera A → cabecera B → cabecera A. Cada vuelta dura distinto por causas internas: peso de pasajeros, ocupación, accidentes, semáforos, posición del estacionamiento. Cada vuelta termina y produce un número (su duración). La planilla acumula esa lista. El gerente abre la planilla y necesita resumirla.
+**Por qué funcionó**: El sistema genera variabilidad naturalmente (las causas internas son visibles y distintas), produce una lista de números sin que parezca abstracta, y permite formular preguntas distintas desde perspectivas distintas (gerente vs. conductor vs. pasajero). La planilla es el dispositivo que convierte el sistema dinámico en un conjunto estadístico.
+**Fecha de canonización**: 2026-05-05
+**Módulo donde se usó**: 1.1
+**Patrón asociado**: "Tres lentes sobre el mismo dato" (ver glosario-metaforas.md — patrón candidato que esta instancia ayuda a canonizar)
+
+---
+
+## Tendencia central — Las "masas" como imagen de los datos
+
+**Sistema-anchor**: Imagen introducida por Alessa: "si imaginás cada recorrido como una masa de pura magnitud". Los datos no son puntos abstractos sino objetos con peso. El promedio mezcla las masas y las reparte en partes iguales. La mediana parte la colección de masas por posición. La moda identifica la masa más frecuente.
+**Por qué funcionó**: La metáfora de masa hace tangible la noción de "peso" de cada observación en el cálculo y permite ver intuitivamente por qué un outlier arrastra la media (tiene mucha masa en un extremo) pero no mueve la mediana (su posición en la fila no cambia el punto central).
+**Fecha de canonización**: 2026-05-05
+**Módulo donde se usó**: 1.1
+**Patrón asociado**: candidato a patrón "Objetos con peso" — ver nota en glosario-metaforas.md
