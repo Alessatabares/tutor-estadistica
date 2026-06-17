@@ -65,4 +65,13 @@ python build/build_contraste.py
 - Usar entidades HTML (`&lt;` `&gt;`) para `<` y `>` dentro del texto (p. ej. `p &lt; 0.05`).
 - `deck_id(idx, fmt)`: fmt 1 = Eje Clínico, 2 = Integrador, 3 = Contraste.
 
-Total actual: **59 tarjetas** — Capa 1: 41 (13 Eje Clínico + 28 Integrador) · Capa 2: 18 Contraste.
+## Áreas
+
+- **Probabilidad**, **Descriptiva**, **Inferencial** — base del tutor (voz clínica/de investigación).
+- **Probabilidad MIT** — el curso *Introduction to Probability* del MIT (RES.6-012, Tsitsiklis):
+  fundamentos (espacio muestral, axiomas, condicional, Bayes, independencia, conteo),
+  variables aleatorias discretas y continuas (PMF/PDF/CDF, esperanza, varianza, distribuciones
+  derivadas, covarianza/correlación, esperanza/varianza iteradas), inferencia (bayesiana, MAP,
+  LMS/LLMS, Markov/Chebyshev, WLLN, TLC, MLE) y procesos (Bernoulli, Poisson, cadenas de Markov).
+
+Total actual: **120 tarjetas** — Capa 1: 86 (30 Eje Clínico + 56 Integrador) · Capa 2: 34 Contraste.
