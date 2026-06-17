@@ -41,3 +41,7 @@ __pycache__/
 # Archivos personales que no van al repo público
 notas-privadas/
 borradores/
+
+# Cache de Python
+__pycache__/
+*.pyc
