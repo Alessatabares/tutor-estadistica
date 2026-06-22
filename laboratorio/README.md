@@ -51,8 +51,16 @@ El repo renderiza fórmulas como PNG porque **la terminal** no muestra LaTeX. Aq
 hace falta: es una página web, así que las fórmulas van como texto matemático que el
 navegador sí muestra bien.
 
----
+## Bloque 2 · Dos variables (`bloque-2.html`)
 
-**Bloque 2 (pendiente) · Dos variables:** Covarianza (rectángulos firmados) → Varianza
-vs Covarianza → Pearson (sin unidades) → Pearson como ángulo/coseno entre vectores →
-escala y unidades. Se construye en un segundo archivo cuando termines de repasar este.
+Mismo motor, nubes 2D que arrastras. Enlazado desde el Bloque 1 (botón arriba).
+
+| # | Lente | Imagen-de-sistema | Qué manipulas |
+|---|-------|-------------------|----------------|
+| 1 | Covarianza | rectángulos firmados desde el centro | arrastras un punto de cuadrante → su rectángulo cambia de signo |
+| 2 | Varianza vs Covarianza | cuadrado (X·X) vs rectángulo (X·Y) | toggle «X contra sí misma» → la nube colapsa a la diagonal y salen cuadrados (Var=Cov(X,X)) |
+| 3 | Pearson | covarianza normalizada | arrastras puntos → Cov se dispara pero r se queda en [−1,+1] |
+| 4 | Pearson como ángulo | dos vectores de desviaciones | giras el ángulo θ → r=cos θ y la nube se aprieta/abre/refleja |
+| 5 | Escala y unidades | nube bajo transformación | sliders a·Y+b → Cov se estira, Pearson no; a<0 voltea el signo |
+
+Progreso independiente del Bloque 1 (otra clave de `localStorage`).

@@ -1,0 +1,480 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio de Intuiciones · Bloque 2: dos variables</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1d2740; --line:#2a3550;
+    --ink:#e7ecf5; --mut:#93a0bd; --blue:#3b82f6; --teal:#0ea5a4;
+    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --violet:#8b5cf6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    background:linear-gradient(180deg,#0c111c,#0f1420);color:var(--ink);line-height:1.55}
+  header{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0;letter-spacing:.2px}
+  header .sub{color:var(--mut);font-size:13px}
+  header a.link{color:var(--teal);font-size:12px;text-decoration:none;border:1px solid var(--line);padding:6px 10px;border-radius:8px}
+  header a.link:hover{border-color:var(--teal)}
+  .prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--mut)}
+  .bar{width:150px;height:8px;background:var(--panel2);border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--green));transition:width .4s}
+  button.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:12px}
+  button.ghost:hover{background:var(--line)}
+
+  .rio{display:flex;gap:4px;padding:12px 22px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line);background:#0d1320}
+  .rio .nodo{font-size:11px;padding:6px 10px;border-radius:8px;background:var(--panel);border:1px solid var(--line);
+    color:var(--mut);white-space:nowrap;cursor:pointer;transition:.15s}
+  .rio .nodo:hover{border-color:var(--blue);color:var(--ink)}
+  .rio .nodo.active{background:var(--panel2);border-color:var(--teal);color:var(--ink)}
+  .rio .nodo .ok{color:var(--green);margin-left:4px}
+  .rio .flecha{color:var(--mut);font-size:11px}
+
+  main{max-width:860px;margin:0 auto;padding:24px 22px 60px}
+  .tag{display:inline-block;font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+  h2{margin:0 0 14px;font-size:24px}
+
+  .fase{border-left:3px solid var(--line);padding:2px 0 2px 16px;margin:0 0 20px}
+  .fase.need{border-color:var(--amber)}
+  .fase.pred{border-color:var(--violet)}
+  .fase.sim{border-color:var(--blue)}
+  .fase.form{border-color:var(--teal)}
+  .fase.fail{border-color:var(--red)}
+  .fase.interp{border-color:var(--green)}
+  .fase h3{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--mut)}
+  .fase p{margin:0 0 8px}
+  .fase .esc{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px;font-size:14px}
+
+  .opts{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .opts button{text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:10px 14px;border-radius:9px;cursor:pointer;font-size:14px;transition:.15s;font-family:inherit}
+  .opts button:hover{border-color:var(--violet)}
+  .opts button.sel{border-color:var(--violet);background:rgba(139,92,246,.14)}
+  .pred-fb{margin-top:10px;font-size:13px;color:var(--mut);display:none}
+  .pred-fb.show{display:block}
+
+  .lab{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:6px}
+  canvas{display:block;width:100%;border-radius:10px;background:#0a0f1a;touch-action:none}
+  .controls{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .ctl{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mut);min-width:150px;flex:1}
+  .ctl input[type=range]{width:100%}
+  .readout{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:13px}
+  .stat b{color:var(--ink)}
+  .stat .v{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--teal);font-weight:700}
+  .stat .v.red{color:var(--amber)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:6px 11px;border-radius:99px;cursor:pointer;font-size:12px}
+  .chip:hover{border-color:var(--blue)}
+  .chip.on{border-color:var(--teal);background:rgba(14,165,164,.14)}
+
+  .formula{background:#0a0f1a;border:1px dashed var(--line);border-radius:10px;padding:14px 16px;
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;color:#cfe3ff;text-align:center;letter-spacing:.3px}
+  .formula .nota{display:block;margin-top:8px;font-size:12px;color:var(--mut);font-family:inherit;letter-spacing:0}
+
+  .frase{margin-top:8px;font-style:italic;color:var(--amber);font-size:15px}
+  .act{background:var(--blue);border:none;color:#fff;padding:11px 20px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;margin-top:8px}
+  .act:hover{filter:brightness(1.1)}
+  .navbtns{display:flex;justify-content:space-between;margin-top:28px;gap:10px}
+  .navbtns button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:10px 16px;border-radius:9px;cursor:pointer;font-size:13px}
+  .navbtns button:hover{border-color:var(--blue)}
+  .navbtns button:disabled{opacity:.4;cursor:not-allowed}
+  .anclas{border-top:1px solid var(--line);padding:16px 22px}
+  .anclas h3{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin:0 0 8px}
+  .pill{display:inline-block;font-size:12px;padding:3px 9px;border-radius:99px;margin:2px;background:rgba(245,158,11,.1);border:1px solid var(--amber);color:#fde68a}
+  .footnote{font-size:12px;color:var(--mut)}
+  .hint{font-size:12px;color:var(--mut);margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>🔬 Laboratorio de Intuiciones</h1>
+    <div class="sub">Bloque 2 · Dos variables: relación, Pearson y ángulo</div>
+  </div>
+  <a class="link" href="index.html">← Bloque 1 (una variable)</a>
+  <div class="prog">
+    <button class="ghost" id="reset">reiniciar</button>
+    <span id="progtxt">0 / 5</span>
+    <div class="bar"><i id="progbar"></i></div>
+  </div>
+</header>
+
+<div class="rio" id="rio"></div>
+<main id="main"></main>
+
+<div class="anclas">
+  <h3>🪝 Frases ancla desbloqueadas</h3>
+  <div id="anclasBox"><span class="footnote">Aún ninguna. Recorre cada lente para coleccionarlas.</span></div>
+</div>
+
+<script>
+/* ============ helpers matemáticos ============ */
+const sum = a => a.reduce((s,x)=>s+x,0);
+const mean = a => sum(a)/a.length;
+const ssAround=(a,c)=>sum(a.map(x=>(x-c)*(x-c)));
+const varSample=a=>ssAround(a,mean(a))/(a.length-1);
+const sd=a=>Math.sqrt(varSample(a));
+function covSample(xs,ys){ const mx=mean(xs),my=mean(ys),n=xs.length;
+  let s=0; for(let i=0;i<n;i++) s+=(xs[i]-mx)*(ys[i]-my); return s/(n-1); }
+function pearson(xs,ys){ const sx=sd(xs),sy=sd(ys); return (sx&&sy)?covSample(xs,ys)/(sx*sy):0; }
+const fmt=(x,d=1)=>Number(x).toFixed(d);
+function mkCanvas(host,h){ const c=document.createElement("canvas"); host.appendChild(c);
+  const dpr=window.devicePixelRatio||1, w=host.clientWidth;
+  c.style.height=h+"px"; c.width=w*dpr; c.height=h*dpr;
+  const ctx=c.getContext("2d"); ctx.scale(dpr,dpr); return {c,ctx,w,h}; }
+
+/* ============ estado / progreso ============ */
+const STORE="labIntuicionesB2";
+let done=new Set(JSON.parse(localStorage.getItem(STORE)||"[]"));
+let anclas=JSON.parse(localStorage.getItem(STORE+"_a")||"{}");
+function save(){ localStorage.setItem(STORE,JSON.stringify([...done])); localStorage.setItem(STORE+"_a",JSON.stringify(anclas)); }
+
+/* ============ LENTES ============ */
+const LENS=[
+{
+  id:"cov", nodo:"Covarianza", title:"Covarianza · rectángulos firmados",
+  need:"Sospechas que dormir menos empeora el rendimiento en la guardia. Tomas 6 internos: horas de sueño (X) y aciertos en un test (Y). A ojo no se ve claro. Necesitas UN número que diga: cuando alguien está por encima de su sueño promedio, ¿su rendimiento también está por encima, o por debajo?",
+  predTxt:"Para un punto donde X está por ENCIMA de su media y Y TAMBIÉN, su rectángulo firmado (dx·dy) es…",
+  pred:[{t:"Positivo (mismo lado del centro)",ok:true},{t:"Negativo",ok:false},{t:"Cero",ok:false}],
+  predWhy:"dx>0 y dy>0 → producto positivo (verde). Lados opuestos del centro → negativo (rojo). La covarianza promedia esos rectángulos firmados. Arrastra un punto al cuadrante opuesto y míralo ponerse rojo.",
+  widget:"cov",
+  formula:"Cov(X,Y) = Σ(xᵢ − x̄)(yᵢ − ȳ) / (n − 1)",
+  formNota:"promedio de rectángulos firmados alrededor del centro de la nube",
+  fail:"Tiene unidades raras (hora·acierto) y su tamaño depende de las escalas: no puedes comparar «qué tan fuerte» es la relación entre estudios distintos. Por eso nace Pearson.",
+  interp:"Cuando X se aleja de su media, ¿Y se aleja CON ella (mismo signo → Cov+) o EN CONTRA (Cov−)?",
+  frase:"Covarianza = promedio de rectángulos firmados alrededor del centro de la nube."
+},
+{
+  id:"varvscov", nodo:"Var vs Cov", title:"Varianza vs Covarianza · cuadrado vs rectángulo",
+  need:"Ya viste que la covarianza son rectángulos de X con Y. Pregunta: ¿y si mido X CONSIGO MISMA (dx·dx)? ¿Qué figura sale, y qué cantidad familiar reaparece?",
+  predTxt:"Si en cada punto reemplazo Y por la propia X (X contra sí misma), los rectángulos se vuelven…",
+  pred:[{t:"Cuadrados, todos positivos (¡es la varianza!)",ok:true},{t:"Rectángulos negativos",ok:false},{t:"Desaparecen",ok:false}],
+  predWhy:"dx·dx = dx² ≥ 0 siempre: cuadrados, todos positivos. Eso es exactamente Var(X). O sea Var(X) = Cov(X,X). Activa el toggle «X contra sí misma» y mira la nube colapsar a la diagonal con cuadrados.",
+  widget:"varvscov",
+  formula:"Var(X) = Cov(X,X) = Σ(xᵢ − x̄)² / (n − 1)",
+  formNota:"la varianza es la covarianza de una variable consigo misma",
+  fail:"El cuadrado no tiene dirección: por eso la varianza NUNCA es negativa, mientras la covarianza sí puede serlo (cuando X y Y van en contra).",
+  interp:"Varianza = cuadrados de X consigo misma. Covarianza = rectángulos de X con Y. La varianza es el caso espejo de la covarianza.",
+  frase:"Varianza = cuadrados de X consigo misma; covarianza = rectángulos de X con Y."
+},
+{
+  id:"pearson", nodo:"Pearson", title:"Pearson · la covarianza sin escala",
+  need:"La covarianza entre sueño y aciertos te dio, digamos, +6.2 «hora·acierto». ¿Es fuerte? Ni idea: las unidades y la escala contaminan el número. Quieres un índice LIMPIO, sin unidades, comparable entre cualquier par de variables.",
+  predTxt:"Pearson divide la covarianza entre sₓ·s_y. ¿Qué logra eso?",
+  pred:[{t:"Cancela unidades y escala; queda entre −1 y +1",ok:true},{t:"La hace más grande",ok:false},{t:"Cambia la dirección",ok:false}],
+  predWhy:"Dividir por las dos desviaciones estándar borra las unidades y normaliza: r vive siempre en [−1, +1]. Arrastra los puntos: la covarianza se dispara, pero r nunca se sale de ese rango.",
+  widget:"pearson",
+  formula:"r = Cov(X,Y) / (sₓ · s_y)        −1 ≤ r ≤ +1",
+  formNota:"covarianza sin unidades: fuerza y dirección de una relación lineal",
+  fail:"Solo capta relaciones LINEALES: una relación fuerte pero curva (forma de U) puede dar r≈0. Y r alto no implica causa.",
+  interp:"Pearson mide fuerza y dirección de una relación lineal, sin unidades, de −1 a +1.",
+  frase:"Pearson es la covarianza sin escala: fuerza y dirección, de −1 a +1."
+},
+{
+  id:"angulo", nodo:"Ángulo", title:"Pearson como ángulo · coseno entre vectores",
+  need:"Hay otra forma de ver Pearson que la vuelve geometría pura. Arma un vector con las desviaciones de X y otro con las de Y. Resulta que r es el COSENO del ángulo entre esos dos vectores. Alineados → r=1. Perpendiculares → r=0. Opuestos → r=−1.",
+  predTxt:"Si el ángulo entre los vectores de desviaciones es 90°, ¿cuánto vale Pearson?",
+  pred:[{t:"0 — perpendiculares, sin alineación lineal",ok:true},{t:"+1",ok:false},{t:"−1",ok:false}],
+  predWhy:"cos(90°)=0. r = cos(θ): a 0° están alineados (r=+1), a 90° perpendiculares (r=0), a 180° opuestos (r=−1). Mueve el ángulo y mira la nube apretarse, abrirse y reflejarse.",
+  widget:"angulo",
+  formula:"r = (x̃ · ỹ) / (|x̃| · |ỹ|) = cos(θ)",
+  formNota:"producto punto normalizado = coseno del ángulo entre los vectores de desviaciones",
+  fail:"El ángulo vive en un espacio de n dimensiones (un eje por dato); el dibujo es una representación. Pero la relación r = cos(θ) es exacta.",
+  interp:"Pearson divide por los tamaños de los vectores y deja solo la alineación: el coseno del ángulo.",
+  frase:"Pearson = coseno del ángulo entre los vectores de desviaciones."
+},
+{
+  id:"escala", nodo:"Escala", title:"Escala y unidades · qué se conserva",
+  need:"Pasas estatura de cm a metros; sumas una constante de calibración; o inviertes un eje (multiplicas por negativo). ¿Cuáles de estas transformaciones cambian la COVARIANZA? ¿Y cuáles cambian PEARSON?",
+  predTxt:"Si multiplico Y por un número NEGATIVO (reflejo el eje), Pearson…",
+  pred:[{t:"Cambia de signo (la dirección se invierte)",ok:true},{t:"No cambia nada",ok:false},{t:"Se vuelve 0",ok:false}],
+  predWhy:"Multiplicar por negativo refleja la nube: lo que subía junto ahora baja. La covarianza se estira y cambia de signo; Pearson conserva la magnitud pero invierte el signo. Sumar una constante no cambia ni Cov ni Pearson.",
+  widget:"escala",
+  formula:"Cov(X, aY+b) = a · Cov(X,Y)        r(X, aY+b) = signo(a) · r(X,Y)",
+  formNota:"la covarianza se estira con las unidades; Pearson cancela el estiramiento (solo guarda el signo)",
+  fail:"Pearson es invariante a escala y posición… y por eso mismo NO te dice nada de las magnitudes reales: dos relaciones con r idéntico pueden tener pendientes muy distintas.",
+  interp:"Sumar constante: la nube se mueve, nada cambia. Multiplicar (+): se estira, Cov cambia, Pearson no. Multiplicar (−): se refleja, Pearson cambia de signo.",
+  frase:"La covarianza se estira con las unidades; Pearson cancela ese estiramiento."
+}
+];
+
+/* ============ WIDGETS ============ */
+// nube 2D con rectángulos firmados; arrastrable. kind: 'cov'|'pearson'; allowSelf para X-vs-X
+function scatter2D(host, opts){
+  const {ctx,w,h}=mkCanvas(host,340);
+  const padL=46,padB=30,padT=14,padR=14;
+  let self=false, drag=-1;
+  const ro=host.parentElement.querySelector(".readout");
+  const chipRow=host.parentElement.querySelector(".chips");
+  const xs=()=>opts.data.map(p=>p.x);
+  function yData(){ return self?opts.data.map(p=>p.x):opts.data.map(p=>p.y); }
+  function yRange(){ return self?opts.xr:opts.yr; }
+  const x2px=v=>padL+(v-opts.xr[0])/(opts.xr[1]-opts.xr[0])*(w-padL-padR);
+  function y2px(v){ const yr=yRange(); return (h-padB)-(v-yr[0])/(yr[1]-yr[0])*(h-padB-padT); }
+  const px2x=p=>opts.xr[0]+(p-padL)/(w-padL-padR)*(opts.xr[1]-opts.xr[0]);
+  function px2y(p){ const yr=yRange(); return yr[0]+((h-padB)-p)/(h-padB-padT)*(yr[1]-yr[0]); }
+
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    const X=xs(), Y=yData(), mx=mean(X), my=mean(Y);
+    // marco
+    ctx.strokeStyle="#1d2740"; ctx.lineWidth=1;
+    ctx.strokeRect(padL,padT,w-padL-padR,h-padB-padT);
+    // cruz en (mx,my)
+    ctx.strokeStyle="#475569"; ctx.setLineDash([4,4]); ctx.lineWidth=1.5;
+    ctx.beginPath(); ctx.moveTo(x2px(mx),padT); ctx.lineTo(x2px(mx),h-padB); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(padL,y2px(my)); ctx.lineTo(w-padR,y2px(my)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle="#93a0bd"; ctx.font="11px ui-monospace,monospace";
+    ctx.fillText("x̄", x2px(mx)+4, h-padB-4);
+    ctx.fillText(self?"x̄":"ȳ", padL+4, y2px(my)-4);
+    // ejes etiquetas
+    ctx.fillText(opts.xlab, w-padR-90, h-12);
+    ctx.save(); ctx.translate(12,padT+70); ctx.rotate(-Math.PI/2); ctx.fillText(self?opts.xlab:opts.ylab,0,0); ctx.restore();
+    // rectángulos firmados
+    opts.data.forEach((p,i)=>{
+      const vy=self?p.x:p.y;
+      const dx=p.x-mx, dy=vy-my, pos=dx*dy>=0;
+      ctx.fillStyle=pos?"rgba(34,197,94,.16)":"rgba(239,68,68,.16)";
+      ctx.strokeStyle=pos?"rgba(34,197,94,.5)":"rgba(239,68,68,.5)";
+      const x0=Math.min(x2px(mx),x2px(p.x)), y0=Math.min(y2px(my),y2px(vy));
+      const ww=Math.abs(x2px(p.x)-x2px(mx)), hh=Math.abs(y2px(vy)-y2px(my));
+      ctx.fillRect(x0,y0,ww,hh); ctx.strokeRect(x0,y0,ww,hh);
+    });
+    // puntos
+    opts.data.forEach((p,i)=>{
+      const vy=self?p.x:p.y;
+      ctx.fillStyle=i===drag?"#bfdbfe":"#3b82f6";
+      ctx.beginPath(); ctx.arc(x2px(p.x),y2px(vy),8,0,7); ctx.fill();
+      ctx.strokeStyle="#0a0f1a"; ctx.lineWidth=2; ctx.stroke();
+    });
+    // readout
+    const cov=covSample(X,Y);
+    if(self){
+      ro.innerHTML=`<span class="stat">Var(X) = Cov(X,X) <span class="v">${fmt(varSample(X))}</span></span>`
+        +`<span class="stat">todos los rectángulos son cuadrados ≥ 0</span>`;
+    } else {
+      let html=`<span class="stat">Cov(X,Y) <span class="v ${cov<0?'red':''}">${fmt(cov,2)}</span></span>`;
+      if(opts.kind==="pearson"){
+        html+=`<span class="stat">sₓ <span class="v">${fmt(sd(X),2)}</span></span>`
+            +`<span class="stat">s_y <span class="v">${fmt(sd(Y),2)}</span></span>`
+            +`<span class="stat">Pearson r <span class="v">${fmt(pearson(X,Y),3)}</span></span>`;
+      }
+      ro.innerHTML=html;
+    }
+  }
+  function pos(e){ const r=host.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; }
+  host.addEventListener("pointerdown",e=>{
+    const {x,y}=pos(e); let best=-1,bd=20;
+    opts.data.forEach((p,i)=>{ const vy=self?p.x:p.y; const d=Math.hypot(x2px(p.x)-x,y2px(vy)-y); if(d<bd){bd=d;best=i;} });
+    if(best>=0){ drag=best; host.setPointerCapture(e.pointerId); draw(); }
+  });
+  host.addEventListener("pointermove",e=>{
+    if(drag<0) return; const {x,y}=pos(e);
+    let nx=Math.max(opts.xr[0],Math.min(opts.xr[1],Math.round(px2x(x))));
+    opts.data[drag].x=nx;
+    if(!self){ let ny=Math.max(opts.yr[0],Math.min(opts.yr[1],Math.round(px2y(y)))); opts.data[drag].y=ny; }
+    draw();
+  });
+  host.addEventListener("pointerup",()=>{drag=-1;draw();});
+  host.addEventListener("pointercancel",()=>{drag=-1;draw();});
+  if(opts.allowSelf && chipRow){
+    const mk=(label,val)=>{const b=document.createElement("button");b.className="chip"+((val&&self)||(!val&&!self)?" on":"");b.textContent=label;
+      b.onclick=()=>{self=val;[...chipRow.querySelectorAll(".chip")].forEach(c=>c.classList.toggle("on",c.dataset.self===String(val)));draw();};
+      b.dataset.self=String(val);return b;};
+    chipRow.appendChild(mk("X contra Y (covarianza)",false));
+    chipRow.appendChild(mk("X contra sí misma (varianza)",true));
+  }
+  host.parentElement.querySelector(".hint").textContent="Arrastra los puntos azules. Verde = rectángulo +, rojo = −.";
+  draw();
+}
+
+// Pearson como ángulo: slider de ángulo θ -> r=cos θ; vectores + nube que morfea
+function angleDial(host){
+  const {ctx,w,h}=mkCanvas(host,320);
+  let theta=55; // grados
+  const ro=host.parentElement.querySelector(".readout");
+  // base de ruido fija (para que la nube morfee suave)
+  function randn(){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+  const N=44, bx=[], be=[];
+  for(let i=0;i<N;i++){ bx.push(randn()); be.push(randn()); }
+  // estandarizar bx, be
+  function z(a){ const m=mean(a),s=sd(a); return a.map(v=>(v-m)/s); }
+  const X=z(bx), E=z(be);
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    const lw=w*0.44, rad=theta*Math.PI/180, r=Math.cos(rad);
+    // ---- panel izquierdo: vectores y ángulo ----
+    const ox=lw*0.5, oy=h*0.62, L=Math.min(lw*0.38,h*0.34);
+    ctx.strokeStyle="#1d2740"; ctx.strokeRect(6,6,lw-12,h-12);
+    ctx.fillStyle="#93a0bd"; ctx.font="11px ui-monospace,monospace"; ctx.fillText("vectores de desviaciones", 12, 22);
+    // vector x̃ (horizontal)
+    ctx.strokeStyle="#3b82f6"; ctx.lineWidth=3;
+    ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ox+L,oy); ctx.stroke();
+    ctx.fillStyle="#93c5fd"; ctx.fillText("x̃", ox+L+4, oy+4);
+    // vector ỹ a ángulo theta (hacia arriba)
+    const ex=ox+L*Math.cos(rad), ey=oy-L*Math.sin(rad);
+    ctx.strokeStyle="#22c55e"; ctx.beginPath(); ctx.moveTo(ox,oy); ctx.lineTo(ex,ey); ctx.stroke();
+    ctx.fillStyle="#86efac"; ctx.fillText("ỹ", ex+4, ey);
+    // arco
+    ctx.strokeStyle="#f59e0b"; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(ox,oy,26,0,-rad,true); ctx.stroke();
+    ctx.fillStyle="#fbbf24"; ctx.fillText("θ", ox+30, oy-12);
+    // ---- panel derecho: nube ----
+    const rx0=lw+8, rw=w-rx0-8, cx=rx0+rw/2, cyc=h/2, sc=Math.min(rw,h)*0.34;
+    ctx.strokeStyle="#1d2740"; ctx.strokeRect(rx0,6,rw-8,h-12);
+    ctx.fillStyle="#93a0bd"; ctx.fillText("la nube con esa correlación", rx0+8, 22);
+    ctx.strokeStyle="#475569"; ctx.setLineDash([3,3]); ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(cx,12); ctx.lineTo(cx,h-8); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(rx0+4,cyc); ctx.lineTo(w-12,cyc); ctx.stroke(); ctx.setLineDash([]);
+    const k=Math.sqrt(Math.max(0,1-r*r));
+    ctx.fillStyle="#3b82f6";
+    for(let i=0;i<N;i++){ const yy=r*X[i]+k*E[i];
+      ctx.beginPath(); ctx.arc(cx+X[i]*sc, cyc-yy*sc, 3.2, 0, 7); ctx.fill(); }
+    const palabra = r>0.85?"alineados → +1": r>0.15?"suben juntas": r>-0.15?"sin alineación lineal": r>-0.85?"van en contra":"opuestos → −1";
+    ro.innerHTML=`<span class="stat">ángulo θ <span class="v">${theta}°</span></span>`
+      +`<span class="stat">r = cos θ <span class="v ${r<0?'red':''}">${fmt(r,3)}</span></span>`
+      +`<span class="stat">${palabra}</span>`;
+  }
+  const cont=host.parentElement.querySelector(".controls");
+  cont.innerHTML=`<div class="ctl">ángulo entre los vectores: <input type="range" min="0" max="180" value="${theta}" id="th"></div>`;
+  cont.querySelector("#th").addEventListener("input",e=>{theta=+e.target.value;draw();});
+  const cr=host.parentElement.querySelector(".chips");
+  [["0° (r=+1)",0],["90° (r=0)",90],["180° (r=−1)",180]].forEach(([l,a])=>{
+    const b=document.createElement("button"); b.className="chip"; b.textContent=l;
+    b.onclick=()=>{theta=a;cont.querySelector("#th").value=a;draw();}; cr.appendChild(b);
+  });
+  host.parentElement.querySelector(".hint").textContent="Gira el ángulo: a 0° los vectores se alinean (r=+1) y la nube es una línea; a 90°, perpendiculares (r=0); a 180°, opuestos (r=−1).";
+  draw();
+}
+
+// escala y unidades: nube base + sliders shift/scale; Cov cambia, Pearson no
+function scaleWidget(host){
+  const {ctx,w,h}=mkCanvas(host,320);
+  const base=[{x:2,y:3},{x:3,y:4},{x:4,y:4},{x:5,y:6},{x:6,y:7},{x:7,y:7},{x:8,y:9},{x:9,y:10}];
+  let a=1, b=0;
+  const ro=host.parentElement.querySelector(".readout");
+  const padL=46,padB=30,padT=14,padR=14;
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    const X=base.map(p=>p.x), Yt=base.map(p=>a*p.y+b);
+    const xr=[0,12]; const allY=Yt.concat([0]); let ylo=Math.min(...allY)-1, yhi=Math.max(...allY)+1;
+    if(yhi-ylo<2){yhi+=1;ylo-=1;}
+    const x2px=v=>padL+(v-xr[0])/(xr[1]-xr[0])*(w-padL-padR);
+    const y2px=v=>(h-padB)-(v-ylo)/(yhi-ylo)*(h-padB-padT);
+    const mx=mean(X),my=mean(Yt);
+    ctx.strokeStyle="#1d2740"; ctx.strokeRect(padL,padT,w-padL-padR,h-padB-padT);
+    ctx.strokeStyle="#475569"; ctx.setLineDash([4,4]);
+    ctx.beginPath(); ctx.moveTo(x2px(mx),padT); ctx.lineTo(x2px(mx),h-padB); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(padL,y2px(my)); ctx.lineTo(w-padR,y2px(my)); ctx.stroke(); ctx.setLineDash([]);
+    base.forEach((p,i)=>{ const vy=a*p.y+b, dx=p.x-mx, dy=vy-my, pos=dx*dy>=0;
+      ctx.fillStyle=pos?"rgba(34,197,94,.13)":"rgba(239,68,68,.13)";
+      const x0=Math.min(x2px(mx),x2px(p.x)),y0=Math.min(y2px(my),y2px(vy));
+      ctx.fillRect(x0,y0,Math.abs(x2px(p.x)-x2px(mx)),Math.abs(y2px(vy)-y2px(my))); });
+    ctx.fillStyle="#3b82f6";
+    base.forEach(p=>{ const vy=a*p.y+b; ctx.beginPath(); ctx.arc(x2px(p.x),y2px(vy),6,0,7); ctx.fill(); });
+    const covB=covSample(X,base.map(p=>p.y)), rB=pearson(X,base.map(p=>p.y));
+    const covT=covSample(X,Yt), rT=pearson(X,Yt);
+    ro.innerHTML=`<span class="stat">Cov original <span class="v">${fmt(covB,2)}</span></span>`
+      +`<span class="stat">Cov transformada <span class="v ${covT<0?'red':''}">${fmt(covT,2)}</span></span>`
+      +`<span class="stat">r original <span class="v">${fmt(rB,3)}</span></span>`
+      +`<span class="stat">r transformada <span class="v ${rT<0?'red':''}">${fmt(rT,3)}</span></span>`;
+  }
+  const cont=host.parentElement.querySelector(".controls");
+  cont.innerHTML=`<div class="ctl">multiplicar Y por a = <span id="av">1.0</span><input type="range" min="-2" max="2" step="0.1" value="1" id="ar"></div>`
+    +`<div class="ctl">sumar a Y  b = <span id="bv">0</span><input type="range" min="-10" max="10" step="1" value="0" id="br"></div>`;
+  cont.querySelector("#ar").oninput=e=>{a=+e.target.value||0.01;cont.querySelector("#av").textContent=fmt(a,1);draw();};
+  cont.querySelector("#br").oninput=e=>{b=+e.target.value;cont.querySelector("#bv").textContent=b;draw();};
+  const cr=host.parentElement.querySelector(".chips");
+  [["sumar +5 (mover)",()=>{b=5;}],["×2 (estirar)",()=>{a=2;}],["×(−1) (reflejar)",()=>{a=-1;}],["volver a normal",()=>{a=1;b=0;}]].forEach(([l,f])=>{
+    const btn=document.createElement("button"); btn.className="chip"; btn.textContent=l;
+    btn.onclick=()=>{f();cont.querySelector("#ar").value=a;cont.querySelector("#br").value=b;cont.querySelector("#av").textContent=fmt(a,1);cont.querySelector("#bv").textContent=b;draw();};
+    cr.appendChild(btn); });
+  host.parentElement.querySelector(".hint").textContent="Mueve a y b: sumar (b) no cambia nada; multiplicar (a) estira la Cov pero no r; a negativo voltea el signo de r.";
+  draw();
+}
+
+const WIDGETS={
+  cov:h=>scatter2D(h,{data:[{x:4,y:5},{x:5,y:4},{x:6,y:7},{x:7,y:6},{x:8,y:9},{x:5,y:6}],xr:[0,12],yr:[0,12],xlab:"horas de sueño (X)",ylab:"aciertos (Y)",kind:"cov"}),
+  varvscov:h=>scatter2D(h,{data:[{x:3,y:6},{x:5,y:5},{x:6,y:8},{x:8,y:7},{x:9,y:10},{x:4,y:4}],xr:[0,12],yr:[0,12],xlab:"X",ylab:"Y",kind:"cov",allowSelf:true}),
+  pearson:h=>scatter2D(h,{data:[{x:3,y:4},{x:4,y:5},{x:5,y:5},{x:6,y:7},{x:7,y:8},{x:8,y:8}],xr:[0,12],yr:[0,12],xlab:"horas de sueño (X)",ylab:"aciertos (Y)",kind:"pearson"}),
+  angulo:h=>angleDial(h),
+  escala:h=>scaleWidget(h)
+};
+
+/* ============ render ============ */
+let cur=0;
+function renderRio(){
+  const r=document.getElementById("rio"); r.innerHTML="";
+  LENS.forEach((L,i)=>{
+    if(i) r.insertAdjacentHTML("beforeend",'<span class="flecha">→</span>');
+    r.insertAdjacentHTML("beforeend",
+      `<span class="nodo ${i===cur?'active':''}" data-i="${i}">${L.nodo}${done.has(L.id)?'<span class="ok">✓</span>':''}</span>`);
+  });
+  r.querySelectorAll(".nodo").forEach(n=>n.onclick=()=>{cur=+n.dataset.i;render();});
+}
+function renderProg(){
+  document.getElementById("progtxt").textContent=`${done.size} / ${LENS.length}`;
+  document.getElementById("progbar").style.width=(done.size/LENS.length*100)+"%";
+}
+function renderAnclas(){
+  const box=document.getElementById("anclasBox"); const it=Object.values(anclas);
+  box.innerHTML= it.length? it.map(f=>`<span class="pill">🪝 ${f}</span>`).join("")
+    : '<span class="footnote">Aún ninguna. Recorre cada lente para coleccionarlas.</span>';
+}
+function render(){
+  renderRio(); renderProg();
+  const L=LENS[cur], m=document.getElementById("main");
+  const solved=done.has(L.id);
+  m.innerHTML=`
+    <span class="tag">Lente ${cur+1} de ${LENS.length}</span>
+    <h2>${L.title}</h2>
+    <div class="fase need"><h3>① La necesidad (escenario real)</h3><div class="esc">${L.need}</div></div>
+    <div class="fase pred"><h3>② Predice — antes de tocar nada</h3>
+      <p>${L.predTxt}</p>
+      <div class="opts" id="pred">${L.pred.map((p,i)=>`<button data-i="${i}">${p.t}</button>`).join("")}</div>
+      <div class="pred-fb" id="predfb"></div>
+    </div>
+    <div class="fase sim"><h3>③ Simula — manipula y observa</h3>
+      <div class="lab">
+        <div class="host"></div>
+        <div class="controls"></div>
+        <div class="chips"></div>
+        <div class="readout"></div>
+        <div class="hint"></div>
+      </div>
+    </div>
+    <div class="fase form"><h3>④ La forma matemática (emerge ahora)</h3>
+      <div class="formula">${L.formula}<span class="nota">${L.formNota}</span></div>
+    </div>
+    <div class="fase fail"><h3>⑤ Cuándo engaña</h3><p>${L.fail}</p></div>
+    <div class="fase interp"><h3>⑥ Interpretación real</h3><p>${L.interp}</p>
+      <div class="frase">🪝 «${L.frase}»</div>
+      <button class="act" id="marcar">${solved?'✓ Repasada — marcar de nuevo':'Marcar lente como repasada ▶'}</button>
+    </div>
+    <div class="navbtns">
+      <button id="prev" ${cur===0?'disabled':''}>← anterior</button>
+      <button id="next" ${cur===LENS.length-1?'disabled':''}>siguiente →</button>
+    </div>`;
+  m.querySelectorAll("#pred button").forEach(b=>b.onclick=()=>{
+    m.querySelectorAll("#pred button").forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel");
+    const ok=L.pred[+b.dataset.i].ok, fb=document.getElementById("predfb");
+    fb.className="pred-fb show";
+    fb.innerHTML=(ok?"✅ Esa es la corazonada correcta. ":"🤔 No del todo. ")+L.predWhy;
+  });
+  WIDGETS[L.widget](m.querySelector(".host"));
+  document.getElementById("marcar").onclick=()=>{ done.add(L.id); anclas[L.id]=L.frase; save();
+    renderProg(); renderRio(); renderAnclas();
+    if(cur<LENS.length-1){ cur++; render(); window.scrollTo({top:0,behavior:"smooth"}); } };
+  document.getElementById("prev").onclick=()=>{cur--;render();window.scrollTo({top:0});};
+  document.getElementById("next").onclick=()=>{cur++;render();window.scrollTo({top:0});};
+}
+document.getElementById("reset").onclick=()=>{ if(!confirm("¿Borrar el progreso?"))return;
+  done=new Set(); anclas={}; save(); renderProg(); renderAnclas(); render(); };
+let rt; window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,200);});
+renderAnclas(); render();
+</script>
+</body>
+</html>
