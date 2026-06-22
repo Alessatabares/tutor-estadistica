@@ -64,3 +64,27 @@ Mismo motor, nubes 2D que arrastras. Enlazado desde el Bloque 1 (botón arriba).
 | 5 | Escala y unidades | nube bajo transformación | sliders a·Y+b → Cov se estira, Pearson no; a<0 voltea el signo |
 
 Progreso independiente del Bloque 1 (otra clave de `localStorage`).
+
+## Gimnasio Simbólico (`gimnasio-simbolico.html`)
+
+Complemento distinto: los laboratorios entrenan la **intuición** (ver el sistema);
+el gimnasio entrena el **músculo simbólico** (leer la fórmula como partitura). Cada
+ejercicio sigue el protocolo: traducir → sustituir → resultado → interpretar.
+
+10 bloques con autocorrección:
+
+1. Leer y expandir símbolos (∑ como «hazlo para todos y súmalo»)
+2. Media, desviaciones, varianza (X=2,4,10)
+3. Media vs mediana (X=2,4,5,100)
+4. Z-score (μ=100, σ=15)
+5. Covarianza (rectángulos firmados)
+6. Pearson
+7. Relación negativa (r=−1)
+8. Cambio de escala (Cov se estira, Pearson no)
+9. Área y probabilidad (uniforme)
+10. Normal y regla 68-95-99.7
+
+Más dos secciones de referencia: **🔧 Desarme** (clicas cada pieza de varianza /
+z / Pearson y ves qué hace y en qué unidades queda) y **📓 Cuaderno** (tabla
+símbolo → traducción → imagen). Numéricos: auto-check con tolerancia. Traducciones:
+escribes, revelas la canónica y te auto-marcas. Progreso en `localStorage`.

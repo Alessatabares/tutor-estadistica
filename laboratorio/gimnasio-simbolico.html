@@ -1,0 +1,379 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gimnasio Simbólico · leer fórmulas como partitura</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1d2740; --line:#2a3550;
+    --ink:#e7ecf5; --mut:#93a0bd; --blue:#3b82f6; --teal:#0ea5a4;
+    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --violet:#8b5cf6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    background:linear-gradient(180deg,#0c111c,#0f1420);color:var(--ink);line-height:1.55}
+  header{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0}
+  header .sub{color:var(--mut);font-size:13px}
+  header a.link{color:var(--teal);font-size:12px;text-decoration:none;border:1px solid var(--line);padding:6px 10px;border-radius:8px}
+  header a.link:hover{border-color:var(--teal)}
+  .prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--mut)}
+  .bar{width:150px;height:8px;background:var(--panel2);border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--green));transition:width .4s}
+  button.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:12px}
+  button.ghost:hover{background:var(--line)}
+
+  .rio{display:flex;gap:4px;padding:12px 22px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line);background:#0d1320}
+  .rio .nodo{font-size:11px;padding:6px 10px;border-radius:8px;background:var(--panel);border:1px solid var(--line);color:var(--mut);white-space:nowrap;cursor:pointer;transition:.15s}
+  .rio .nodo:hover{border-color:var(--blue);color:var(--ink)}
+  .rio .nodo.active{background:var(--panel2);border-color:var(--teal);color:var(--ink)}
+  .rio .nodo .ok{color:var(--green);margin-left:3px}
+
+  main{max-width:820px;margin:0 auto;padding:22px 22px 60px}
+  h2{margin:0 0 6px;font-size:23px}
+  .lead{color:var(--mut);margin:0 0 18px}
+  .intro{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:0 0 18px;font-size:14px}
+  .intro b{color:var(--ink)}
+  .pasos{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .paso{background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:6px 10px;font-size:12px;color:var(--mut)}
+
+  .ex{background:var(--panel);border:1px solid var(--line);border-radius:13px;padding:16px;margin:0 0 14px}
+  .ex .nro{font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:.7px}
+  .ex .ask{margin:4px 0 10px;font-size:15px}
+  .formula{background:#0a0f1a;border:1px dashed var(--line);border-radius:9px;padding:11px 14px;margin:8px 0;
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:16px;color:#cfe3ff;text-align:center;letter-spacing:.3px}
+  .data{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;color:var(--amber);margin:6px 0}
+  textarea,input[type=text]{width:100%;background:#0c1322;border:1px solid var(--line);color:var(--ink);border-radius:8px;
+    padding:9px 11px;font-size:14px;font-family:inherit}
+  textarea{min-height:48px;resize:vertical}
+  input.num{width:160px;font-family:ui-monospace,monospace;text-align:center;font-size:15px}
+  .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center;margin-top:6px}
+  button.act{background:var(--blue);border:none;color:#fff;padding:9px 16px;border-radius:8px;cursor:pointer;font-size:13px;font-weight:600}
+  button.act:hover{filter:brightness(1.1)}
+  .opts{display:flex;flex-direction:column;gap:7px;margin-top:8px}
+  .opts button{text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:10px 13px;border-radius:8px;cursor:pointer;font-size:14px}
+  .opts button:hover{border-color:var(--violet)}
+  .opts button.ok{border-color:var(--green);background:rgba(34,197,94,.13)}
+  .opts button.bad{border-color:var(--red);background:rgba(239,68,68,.13)}
+
+  .fb{margin-top:10px;padding:10px 13px;border-radius:9px;font-size:13.5px;display:none}
+  .fb.show{display:block}
+  .fb.good{background:rgba(34,197,94,.12);border:1px solid var(--green);color:#bbf7d0}
+  .fb.bad{background:rgba(239,68,68,.12);border:1px solid var(--red);color:#fecaca}
+  .fb.info{background:rgba(59,130,246,.1);border:1px solid var(--blue);color:#bfdbfe}
+  .fb .canon{font-family:ui-monospace,monospace;color:#cfe3ff;margin-top:4px}
+  .selfmk{display:flex;gap:8px;margin-top:8px}
+  .selfmk button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:6px 12px;border-radius:8px;cursor:pointer;font-size:12px}
+  .selfmk button:hover{border-color:var(--teal)}
+  .done-badge{color:var(--green);font-size:12px;margin-left:8px}
+
+  /* desarme */
+  .desf{background:#0a0f1a;border:1px solid var(--line);border-radius:11px;padding:16px;margin:0 0 12px}
+  .desf .ftokens{font-family:ui-monospace,monospace;font-size:18px;text-align:center;color:#cfe3ff;margin-bottom:10px;line-height:2}
+  .tok{padding:2px 6px;border-radius:6px;border:1px solid transparent;cursor:pointer}
+  .tok:hover{background:var(--panel2);border-color:var(--line)}
+  .tok.on{background:rgba(245,158,11,.18);border-color:var(--amber);color:#fde68a}
+  .desf .mean{font-size:14px;color:var(--ink);min-height:38px;background:var(--panel2);border:1px solid var(--line);border-radius:8px;padding:10px 12px}
+  .desf .mean .u{color:var(--mut);font-size:12px}
+
+  table{border-collapse:collapse;width:100%;font-size:14px;margin-top:6px}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left}
+  th{background:var(--panel2);color:var(--mut);font-weight:600}
+  td .s{font-family:ui-monospace,monospace;color:#cfe3ff}
+
+  .anclas{border-top:1px solid var(--line);padding:16px 22px;font-style:italic;color:var(--amber);font-size:14px}
+  .footnote{font-size:12px;color:var(--mut)}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>🏋️ Gimnasio Simbólico</h1>
+    <div class="sub">Leer fórmulas como partitura: traduce → sustituye → resultado → interpreta</div>
+  </div>
+  <a class="link" href="index.html">← Laboratorios</a>
+  <div class="prog">
+    <button class="ghost" id="reset">reiniciar</button>
+    <span id="progtxt">0 / 0</span>
+    <div class="bar"><i id="progbar"></i></div>
+  </div>
+</header>
+
+<div class="rio" id="rio"></div>
+<main id="main"></main>
+<div class="anclas">🪝 La fluidez simbólica nace de traducir, expandir, sustituir, manipular e interpretar muchas fórmulas pequeñas — no de una explicación perfecta.</div>
+
+<script>
+/* ============ utilidades de chequeo ============ */
+function parseNum(s){ if(s==null) return NaN; return parseFloat(String(s).replace(",",".").replace(/\s/g,"")); }
+const STORE="gimnasioSimbolico";
+let done=new Set(JSON.parse(localStorage.getItem(STORE)||"[]"));
+function save(){ localStorage.setItem(STORE,JSON.stringify([...done])); }
+
+/* ============ contenido ============ */
+const SECTIONS=[
+{ id:"b1", nodo:"1·Leer", title:"Bloque 1 — Leer y expandir símbolos",
+  intro:"Aquí no calculas: traduces a español y expandes sumatorias. La ∑ es solo «haz esto para todos y súmalo».",
+  ex:[
+   {id:"b1e1",type:"read",sym:"x̄ = (Σ xᵢ) / n",ask:"Tradúcela en palabras (no calcules).",
+     ans:"La media: suma todos los datos y divide entre cuántos hay (n). El reparto que conserva el total."},
+   {id:"b1e2",type:"read",sym:"Σᵢ₌₁⁴ xᵢ",ask:"Expande esta sumatoria para n=4.",
+     ans:"x₁ + x₂ + x₃ + x₄"},
+   {id:"b1e3",type:"read",sym:"Σᵢ₌₁³ (xᵢ − x̄)²",ask:"Expande (n=3).",
+     ans:"(x₁ − x̄)² + (x₂ − x̄)² + (x₃ − x̄)²"},
+   {id:"b1e4",type:"read",sym:"Σᵢ₌₁³ (xᵢ − x̄)(yᵢ − ȳ)",ask:"Expande (n=3). Este es el nacimiento simbólico de la covarianza.",
+     ans:"(x₁ − x̄)(y₁ − ȳ) + (x₂ − x̄)(y₂ − ȳ) + (x₃ − x̄)(y₃ − ȳ)"}
+  ]},
+{ id:"b2", nodo:"2·Varianza", title:"Bloque 2 — Media, desviaciones, varianza",
+  intro:"Datos: X = 2, 4, 10. Recorre todo el camino hasta la SD.",
+  ex:[
+   {id:"b2e1",type:"num",ask:"Calcula la media x̄ = (2+4+10)/3",ans:5.33,tol:0.05,steps:"16/3 = 5.33"},
+   {id:"b2e2",type:"num",ask:"Suma de las desviaciones Σ(xᵢ − x̄). (Pista: debe dar algo muy especial.)",ans:0,tol:0.05,
+     steps:"(2−5.33)+(4−5.33)+(10−5.33) = −3.33 −1.33 +4.67 = 0. Siempre dan cero: por eso se elevan al cuadrado."},
+   {id:"b2e3",type:"num",ask:"Suma de cuadrados Σ(xᵢ − x̄)²",ans:34.67,tol:0.6,
+     steps:"(−3.33)² + (−1.33)² + (4.67)² = 11.11 + 1.78 + 21.78 = 34.67"},
+   {id:"b2e4",type:"num",ask:"Varianza POBLACIONAL σ² = Σ(xᵢ−μ)² / N  (N=3)",ans:11.56,tol:0.3,steps:"34.67 / 3 = 11.56"},
+   {id:"b2e5",type:"num",ask:"Varianza MUESTRAL s² = Σ(xᵢ−x̄)² / (n−1)  (n−1=2)",ans:17.33,tol:0.3,steps:"34.67 / 2 = 17.33"},
+   {id:"b2e6",type:"num",ask:"Desviación estándar muestral s = √s²",ans:4.16,tol:0.15,steps:"√17.33 = 4.16"}
+  ]},
+{ id:"b3", nodo:"3·Mediana", title:"Bloque 3 — Media vs mediana",
+  intro:"Datos: X = 2, 4, 5, 100. Mira quién aguanta el outlier.",
+  ex:[
+   {id:"b3e1",type:"num",ask:"Media x̄ = (2+4+5+100)/4",ans:27.75,tol:0.05,steps:"111/4 = 27.75"},
+   {id:"b3e2",type:"num",ask:"Mediana (4 datos → promedio de los dos centrales): (x₂ + x₃)/2",ans:4.5,tol:0.05,steps:"(4+5)/2 = 4.5"},
+   {id:"b3e3",type:"multi",ask:"¿Cuál centro representa mejor a la mayoría, y por qué?",
+     options:[{t:"La mediana (4.5): el 100 arrastra la media hasta 27.75, lejos de casi todos",ok:true},
+              {t:"La media (27.75): usa toda la información",ok:false},
+              {t:"Las dos representan igual de bien",ok:false}],
+     why:"El 100 es un outlier que infla la media. La mediana solo cuenta posiciones, así que aguanta."}
+  ]},
+{ id:"b4", nodo:"4·Z-score", title:"Bloque 4 — Z-score",
+  intro:"Supón μ = 100, σ = 15, x = 130.",
+  ex:[
+   {id:"b4e1",type:"num",ask:"Calcula z = (x − μ)/σ = (130 − 100)/15",ans:2,tol:0.05,steps:"30/15 = 2"},
+   {id:"b4e2",type:"multi",ask:"z = 2 significa…",
+     options:[{t:"El dato está 2 desviaciones estándar POR ENCIMA de la media",ok:true},
+              {t:"El dato vale el doble de la media",ok:false},
+              {t:"Hay 2% de probabilidad",ok:false}],
+     why:"z es posición medida en SD: cuántos pasos típicos te alejas del centro."},
+   {id:"b4e3",type:"num",ask:"Reconstruye x si z = −1, usando x = μ + zσ",ans:85,tol:0.05,steps:"100 + (−1)(15) = 85"}
+  ]},
+{ id:"b5", nodo:"5·Covarianza", title:"Bloque 5 — Covarianza (rectángulos firmados)",
+  intro:"Pares (X,Y):  A(1,2)  B(2,4)  C(3,6).",
+  ex:[
+   {id:"b5e1",type:"num",ask:"Media de X: x̄ = (1+2+3)/3",ans:2,tol:0.02,steps:"6/3 = 2"},
+   {id:"b5e2",type:"num",ask:"Media de Y: ȳ = (2+4+6)/3",ans:4,tol:0.02,steps:"12/3 = 4"},
+   {id:"b5e3",type:"num",ask:"Suma de productos Σ(xᵢ−x̄)(yᵢ−ȳ). dx=−1,0,1 · dy=−2,0,2",ans:4,tol:0.05,
+     steps:"(−1)(−2) + (0)(0) + (1)(2) = 2 + 0 + 2 = 4"},
+   {id:"b5e4",type:"num",ask:"Covarianza muestral = Σ(dx·dy)/(n−1) = 4/2",ans:2,tol:0.05,steps:"4/2 = 2"},
+   {id:"b5e5",type:"multi",ask:"La covarianza es +2. ¿Qué significa?",
+     options:[{t:"Positiva: cuando X sube respecto a su media, Y también → se mueven juntas",ok:true},
+              {t:"Negativa: se mueven en contra",ok:false},
+              {t:"Cero: no hay relación",ok:false}],
+     why:"Signo + = mismo lado del centro = rectángulos verdes que dominan."}
+  ]},
+{ id:"b6", nodo:"6·Pearson", title:"Bloque 6 — Pearson",
+  intro:"Mismos datos: A(1,2) B(2,4) C(3,6). Ya tienes Cov(X,Y)=2.",
+  ex:[
+   {id:"b6e1",type:"num",ask:"Desviación estándar de X (datos 1,2,3): sₓ = √(Σdx²/(n−1)) = √(2/2)",ans:1,tol:0.05,steps:"√(((−1)²+0+1²)/2) = √1 = 1"},
+   {id:"b6e2",type:"num",ask:"Desviación estándar de Y (datos 2,4,6): s_y = √(8/2)",ans:2,tol:0.05,steps:"√(((−2)²+0+2²)/2) = √4 = 2"},
+   {id:"b6e3",type:"num",ask:"Pearson r = Cov/(sₓ·s_y) = 2/(1·2)",ans:1,tol:0.02,steps:"2/2 = 1"},
+   {id:"b6e4",type:"multi",ask:"r = 1 significa…",
+     options:[{t:"Relación lineal perfecta positiva (los puntos caen en una recta que sube)",ok:true},
+              {t:"Que X causa Y",ok:false},
+              {t:"Que las unidades son iguales",ok:false}],
+     why:"r=+1 es alineación total (ángulo 0° entre los vectores de desviaciones). Correlación no es causa."}
+  ]},
+{ id:"b7", nodo:"7·Negativa", title:"Bloque 7 — Relación negativa",
+  intro:"Pares: A(1,6) B(2,4) C(3,2). Repite el camino y mira cambiar el signo.",
+  ex:[
+   {id:"b7e1",type:"num",ask:"Suma de productos Σ(dx·dy). dx=−1,0,1 · dy=2,0,−2",ans:-4,tol:0.05,steps:"(−1)(2)+(0)(0)+(1)(−2) = −2 + 0 − 2 = −4"},
+   {id:"b7e2",type:"num",ask:"Covarianza muestral = −4/2",ans:-2,tol:0.05,steps:"−4/2 = −2"},
+   {id:"b7e3",type:"num",ask:"Pearson r = Cov/(sₓ·s_y) = −2/(1·2)",ans:-1,tol:0.02,steps:"−2/2 = −1"},
+   {id:"b7e4",type:"multi",ask:"¿Por qué ahora Pearson sale negativo?",
+     options:[{t:"Porque X sube mientras Y baja: lados opuestos del centro → productos negativos",ok:true},
+              {t:"Porque los números son más chicos",ok:false},
+              {t:"Por un error de cálculo",ok:false}],
+     why:"dx y dy con signos opuestos → rectángulos rojos → covarianza y r negativos."}
+  ]},
+{ id:"b8", nodo:"8·Escala", title:"Bloque 8 — Cambio de escala",
+  intro:"X = 1,2,3 · Y = 2,4,6. Ahora X' = 10X = 10,20,30. Predice ANTES de calcular.",
+  ex:[
+   {id:"b8e1",type:"multi",ask:"Si multiplicas X por 10, ¿qué pasa con la covarianza?",
+     options:[{t:"Se multiplica por 10",ok:true},{t:"Se divide entre 10",ok:false},{t:"Queda igual",ok:false}],
+     why:"Cov(aX,Y) = a·Cov(X,Y). La covarianza se estira con las unidades."},
+   {id:"b8e2",type:"multi",ask:"¿Y qué pasa con Pearson?",
+     options:[{t:"Queda igual",ok:true},{t:"Se multiplica por 10",ok:false},{t:"Se vuelve 0",ok:false}],
+     why:"r divide por sₓ·s_y, que también se estira ×10 → el factor se cancela. Pearson es invariante a escala."},
+   {id:"b8e3",type:"read",sym:"r = Cov(X,Y) / (sₓ · s_y)",ask:"Explica por qué dividir entre sₓ·s_y elimina las unidades.",
+     ans:"Cov tiene unidades de X·Y (p.ej. hora·punto). sₓ está en unidades de X (hora) y s_y en unidades de Y (punto), así que sₓ·s_y también está en hora·punto. Al dividir, las unidades se cancelan y queda un número puro entre −1 y +1."}
+  ]},
+{ id:"b9", nodo:"9·Área", title:"Bloque 9 — Área y probabilidad (uniforme)",
+  intro:"Distribución uniforme entre 0 y 10. La altura de la densidad es 0.1 (constante).",
+  ex:[
+   {id:"b9e1",type:"num",ask:"Verifica que el área total vale 1: base × altura = 10 × 0.1",ans:1,tol:0.001,steps:"10 × 0.1 = 1. El área total bajo cualquier densidad es 1 = 100%."},
+   {id:"b9e2",type:"num",ask:"Probabilidad de caer entre 2 y 5: (5 − 2) × 0.1",ans:0.3,tol:0.01,steps:"3 × 0.1 = 0.3"},
+   {id:"b9e3",type:"num",ask:"Pásalo a porcentaje (escribe 30 para 30%).",ans:30,tol:0.5,steps:"0.3 = 30%. En continuas: área = probabilidad."}
+  ]},
+{ id:"b10", nodo:"10·68-95-99.7", title:"Bloque 10 — Normal y regla 68-95-99.7",
+  intro:"Normal con μ = 70, σ = 10.",
+  ex:[
+   {id:"b10e1",type:"num",ask:"Límite INFERIOR de ±1 SD: μ − σ",ans:60,tol:0.1,steps:"70 − 10 = 60 (intervalo 60 a 80, ≈68%)"},
+   {id:"b10e2",type:"num",ask:"Límite SUPERIOR de ±2 SD: μ + 2σ",ans:90,tol:0.1,steps:"70 + 20 = 90 (intervalo 50 a 90, ≈95%)"},
+   {id:"b10e3",type:"num",ask:"Límite INFERIOR de ±3 SD: μ − 3σ",ans:40,tol:0.1,steps:"70 − 30 = 40 (intervalo 40 a 100, ≈99.7%)"},
+   {id:"b10e4",type:"multi",ask:"Aproximadamente el 95% de los datos cae entre…",
+     options:[{t:"50 y 90 (±2 SD)",ok:true},{t:"60 y 80 (±1 SD)",ok:false},{t:"40 y 100 (±3 SD)",ok:false}],
+     why:"±1σ≈68%, ±2σ≈95%, ±3σ≈99.7% (más fino: ±1.96σ≈95%)."}
+  ]},
+{ id:"desarme", nodo:"🔧 Desarme", title:"Desarme de fórmula — clica cada pieza",
+  intro:"Toca cada parte para ver qué hace y en qué unidades queda. Control total = leer la fórmula por piezas.",
+  desarme:[
+   {f:[["s²","var"],[" = ",null],["Σ","sum"],["(xᵢ − x̄)","dev"],["²","sq"],[" / ",null],["(n − 1)","gl"]],
+    title:"Varianza muestral",
+    parts:{var:["s² = el resultado","la dispersión: tensión cuadrada promedio alrededor del centro","unidades²"],
+      sum:["Σ — suma","junta todas las piezas: «haz esto para cada dato y súmalo»",""],
+      dev:["(xᵢ − x̄) — desviación","la distancia de cada dato al centro; una flecha desde la media","unidades de X"],
+      sq:["( )² — al cuadrado","convierte la distancia en área y la vuelve positiva (las firmadas suman 0)","unidades²"],
+      gl:["n − 1 — los grados de libertad","divide para promediar y corrige el sesgo de usar la media muestral",""]}},
+   {f:[["z","z"],[" = ",null],["(x − μ)","num"],[" / ",null],["σ","den"]],
+    title:"Z-score",
+    parts:{z:["z — el resultado","posición del dato medida en desviaciones estándar","sin unidades"],
+      num:["x − μ — distancia","cuánto se aleja el dato de la media, en unidades originales","unidades de X"],
+      den:["σ — paso típico","el tamaño de un paso típico (1 SD). Dividir mide la distancia EN pasos","unidades de X"]}},
+   {f:[["r","r"],[" = ",null],["Cov(X,Y)","cov"],[" / ",null],["(sₓ · s_y)","den"]],
+    title:"Pearson",
+    parts:{r:["r — el resultado","fuerza y dirección de la relación lineal, de −1 a +1","sin unidades"],
+      cov:["Cov(X,Y) — arriba","movimiento conjunto: promedio de rectángulos firmados","unidades X·Y"],
+      den:["sₓ · s_y — abajo","tamaño típico de X por tamaño típico de Y; al dividir, quita escala y unidades","unidades X·Y"]}}
+  ]},
+{ id:"cuaderno", nodo:"📓 Cuaderno", title:"Cuaderno símbolo → imagen",
+  intro:"Tu tabla de tres columnas. La referencia rápida del gimnasio.",
+  tabla:[
+   ["xᵢ − x̄","dato menos media","flecha desde el centro"],
+   ["(xᵢ − x̄)²","distancia al cuadrado","un cuadrado (área)"],
+   ["Σ","sumar todos","juntar piezas"],
+   ["s","desviación estándar","la liga típica / paso típico"],
+   ["z","posición en SD","cuántos pasos desde el centro"],
+   ["Cov(X,Y)","rectángulos firmados","verde + / rojo −"],
+   ["r","Pearson","alineación / ángulo (coseno)"],
+   ["∫ₐᵇ f(x)dx","integral","suma de pedacitos de área de a hasta b"]]
+}
+];
+
+/* ============ progreso ============ */
+const GRADABLE=[]; SECTIONS.forEach(s=>{ if(s.ex) s.ex.forEach(e=>GRADABLE.push(e.id)); });
+function renderProg(){
+  const n=GRADABLE.filter(id=>done.has(id)).length;
+  document.getElementById("progtxt").textContent=`${n} / ${GRADABLE.length}`;
+  document.getElementById("progbar").style.width=(n/GRADABLE.length*100)+"%";
+}
+function mark(id){ done.add(id); save(); renderProg(); renderRio(); }
+
+/* ============ render ============ */
+let cur=0;
+function renderRio(){
+  const r=document.getElementById("rio"); r.innerHTML="";
+  SECTIONS.forEach((s,i)=>{
+    const total=s.ex?s.ex.length:0, hechos=s.ex?s.ex.filter(e=>done.has(e.id)).length:0;
+    const allok=total>0&&hechos===total;
+    r.insertAdjacentHTML("beforeend",
+      `<span class="nodo ${i===cur?'active':''}" data-i="${i}">${s.nodo}${allok?'<span class="ok">✓</span>':''}</span>`);
+  });
+  r.querySelectorAll(".nodo").forEach(n=>n.onclick=()=>{cur=+n.dataset.i;render();window.scrollTo({top:0});});
+}
+function exHTML(e,idx){
+  const hecho=done.has(e.id);
+  let body="";
+  if(e.type==="read"){
+    body=`${e.sym?`<div class="formula">${e.sym}</div>`:""}
+      <textarea placeholder="Escribe tu traducción / expansión (opcional)…"></textarea>
+      <div class="row"><button class="act" data-act="reveal">Ver respuesta</button></div>
+      <div class="fb" data-fb></div>
+      <div class="selfmk" data-self style="display:none">
+        <button data-mk="1">✓ Lo logré</button><button data-mk="0">↻ Repasar de nuevo</button>
+      </div>`;
+  } else if(e.type==="num"){
+    body=`<div class="row"><input class="num" type="text" inputmode="decimal" placeholder="tu número">
+      <button class="act" data-act="check">Comprobar</button>
+      <button class="act" data-act="reveal" style="background:var(--panel2);border:1px solid var(--line)">Ver paso</button></div>
+      <div class="fb" data-fb></div>`;
+  } else if(e.type==="multi"){
+    body=`<div class="opts" data-opts>${e.options.map((o,i)=>`<button data-i="${i}">${o.t}</button>`).join("")}</div>
+      <div class="fb" data-fb></div>`;
+  }
+  return `<div class="ex" data-ex="${e.id}">
+    <div class="nro">Ejercicio ${idx+1}${hecho?'<span class="done-badge">✓ hecho</span>':''}</div>
+    <div class="ask">${e.ask}</div>${body}</div>`;
+}
+function render(){
+  renderRio(); renderProg();
+  const S=SECTIONS[cur], m=document.getElementById("main");
+  let html=`<h2>${S.title}</h2><p class="lead">${S.intro||""}</p>`;
+  if(S.id==="b1"||S.id==="b2"||S.id==="b5"){
+    html+=`<div class="intro">Para cada ejercicio responde en tu cabeza en 4 pasos: <b>① traducción → ② sustitución → ③ resultado → ④ interpretación.</b>
+      <div class="pasos"><span class="paso">① en palabras</span><span class="paso">② con números</span><span class="paso">③ resultado</span><span class="paso">④ qué significa</span></div></div>`;
+  }
+  if(S.ex){ S.ex.forEach((e,i)=>html+=exHTML(e,i)); }
+  if(S.desarme){ S.desarme.forEach((d,di)=>{
+    html+=`<div class="desf" data-des="${di}"><div style="color:var(--mut);font-size:12px;margin-bottom:6px">${d.title}</div>
+      <div class="ftokens">${d.f.map((t,ti)=>t[1]?`<span class="tok" data-k="${t[1]}">${t[0]}</span>`:`<span>${t[0]}</span>`).join("")}</div>
+      <div class="mean">Toca una pieza ↑</div></div>`;
+  }); }
+  if(S.tabla){
+    html+=`<table><tr><th>Símbolo</th><th>Traducción</th><th>Imagen</th></tr>
+      ${S.tabla.map(r=>`<tr><td class="s">${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td></tr>`).join("")}</table>`;
+  }
+  m.innerHTML=html;
+  if(S.ex) S.ex.forEach(e=>wire(e));
+  if(S.desarme) S.desarme.forEach((d,di)=>wireDes(d,di));
+}
+function fbEl(id){ return document.querySelector(`[data-ex="${id}"] [data-fb]`); }
+function wire(e){
+  const card=document.querySelector(`[data-ex="${e.id}"]`);
+  if(e.type==="read"){
+    card.querySelector('[data-act="reveal"]').onclick=()=>{
+      const fb=card.querySelector("[data-fb]"); fb.className="fb show info";
+      fb.innerHTML=`Traducción canónica:<div class="canon">${e.ans}</div>`;
+      card.querySelector("[data-self]").style.display="flex";
+    };
+    card.querySelector("[data-self]").querySelectorAll("button").forEach(b=>b.onclick=()=>{
+      if(b.dataset.mk==="1"){ mark(e.id); const fb=card.querySelector("[data-fb]"); fb.className="fb show good"; fb.innerHTML="✅ Marcada. La leíste como partitura."; }
+      else { done.delete(e.id); save(); renderProg(); renderRio(); const fb=card.querySelector("[data-fb]"); fb.className="fb show info"; fb.innerHTML="↻ Vuélvela a leer en voz alta y compárala."; }
+    });
+  } else if(e.type==="num"){
+    card.querySelector('[data-act="check"]').onclick=()=>{
+      const v=parseNum(card.querySelector("input").value), fb=card.querySelector("[data-fb]");
+      if(isNaN(v)){ fb.className="fb show info"; fb.innerHTML="Escribe un número."; return; }
+      if(Math.abs(v-e.ans)<=e.tol){ fb.className="fb show good"; fb.innerHTML=`✅ Correcto. <span class="canon">${e.steps}</span>`; mark(e.id); }
+      else { fb.className="fb show bad"; fb.innerHTML="❌ Aún no. Revisa el cálculo paso a paso (usa «Ver paso» si te trabas)."; }
+    };
+    card.querySelector('[data-act="reveal"]').onclick=()=>{
+      const fb=card.querySelector("[data-fb]"); fb.className="fb show info";
+      fb.innerHTML=`Paso a paso: <span class="canon">${e.steps}</span>  →  resultado ≈ <b>${e.ans}</b>`;
+    };
+  } else if(e.type==="multi"){
+    card.querySelectorAll("[data-opts] button").forEach(b=>b.onclick=()=>{
+      const o=e.options[+b.dataset.i], fb=card.querySelector("[data-fb]");
+      card.querySelectorAll("[data-opts] button").forEach(x=>x.classList.remove("ok","bad"));
+      b.classList.add(o.ok?"ok":"bad");
+      fb.className="fb show "+(o.ok?"good":"bad");
+      fb.innerHTML=(o.ok?"✅ ":"❌ ")+e.why;
+      if(o.ok) mark(e.id);
+    });
+  }
+}
+function wireDes(d,di){
+  const box=document.querySelector(`[data-des="${di}"]`);
+  box.querySelectorAll(".tok").forEach(t=>t.onclick=()=>{
+    box.querySelectorAll(".tok").forEach(x=>x.classList.remove("on")); t.classList.add("on");
+    const p=d.parts[t.dataset.k];
+    box.querySelector(".mean").innerHTML=`<b>${p[0]}</b><br>${p[1]}${p[2]?`<br><span class="u">unidades: ${p[2]}</span>`:""}`;
+  });
+}
+document.getElementById("reset").onclick=()=>{ if(!confirm("¿Borrar el progreso del gimnasio?"))return; done=new Set(); save(); render(); };
+let rt; window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,250);});
+render();
+</script>
+</body>
+</html>
