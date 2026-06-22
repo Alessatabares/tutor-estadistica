@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Laboratorio de Intuiciones · Bloque 1: una variable</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1d2740; --line:#2a3550;
+    --ink:#e7ecf5; --mut:#93a0bd; --blue:#3b82f6; --teal:#0ea5a4;
+    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --violet:#8b5cf6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    background:linear-gradient(180deg,#0c111c,#0f1420);color:var(--ink);line-height:1.55}
+  header{padding:16px 22px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  header h1{font-size:17px;margin:0;letter-spacing:.2px}
+  header .sub{color:var(--mut);font-size:13px}
+  .prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--mut)}
+  .bar{width:150px;height:8px;background:var(--panel2);border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--teal),var(--green));transition:width .4s}
+  button.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:7px 12px;border-radius:8px;cursor:pointer;font-size:12px}
+  button.ghost:hover{background:var(--line)}
+
+  .rio{display:flex;gap:4px;padding:12px 22px;flex-wrap:wrap;align-items:center;border-bottom:1px solid var(--line);background:#0d1320}
+  .rio .nodo{font-size:11px;padding:6px 10px;border-radius:8px;background:var(--panel);border:1px solid var(--line);
+    color:var(--mut);white-space:nowrap;cursor:pointer;transition:.15s}
+  .rio .nodo:hover{border-color:var(--blue);color:var(--ink)}
+  .rio .nodo.active{background:var(--panel2);border-color:var(--teal);color:var(--ink)}
+  .rio .nodo .ok{color:var(--green);margin-left:4px}
+  .rio .flecha{color:var(--mut);font-size:11px}
+
+  main{max-width:860px;margin:0 auto;padding:24px 22px 60px}
+  .tag{display:inline-block;font-size:11px;color:var(--teal);text-transform:uppercase;letter-spacing:.8px;margin-bottom:6px}
+  h2{margin:0 0 14px;font-size:24px}
+
+  .fase{border-left:3px solid var(--line);padding:2px 0 2px 16px;margin:0 0 20px}
+  .fase.need{border-color:var(--amber)}
+  .fase.pred{border-color:var(--violet)}
+  .fase.sim{border-color:var(--blue)}
+  .fase.form{border-color:var(--teal)}
+  .fase.fail{border-color:var(--red)}
+  .fase.interp{border-color:var(--green)}
+  .fase h3{margin:0 0 6px;font-size:12px;text-transform:uppercase;letter-spacing:.7px;color:var(--mut)}
+  .fase p{margin:0 0 8px}
+  .fase .esc{background:var(--panel);border:1px solid var(--line);border-radius:10px;padding:13px 15px;font-size:14px}
+
+  .opts{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+  .opts button{text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:10px 14px;border-radius:9px;cursor:pointer;font-size:14px;transition:.15s;font-family:inherit}
+  .opts button:hover{border-color:var(--violet)}
+  .opts button.sel{border-color:var(--violet);background:rgba(139,92,246,.14)}
+  .pred-fb{margin-top:10px;font-size:13px;color:var(--mut);display:none}
+  .pred-fb.show{display:block}
+
+  .lab{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px;margin-top:6px}
+  canvas{display:block;width:100%;border-radius:10px;background:#0a0f1a;touch-action:none}
+  .controls{display:flex;gap:14px;flex-wrap:wrap;align-items:center;margin-top:12px}
+  .ctl{display:flex;flex-direction:column;gap:3px;font-size:12px;color:var(--mut);min-width:150px;flex:1}
+  .ctl input[type=range]{width:100%}
+  .readout{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  .stat{background:var(--panel2);border:1px solid var(--line);border-radius:9px;padding:8px 12px;font-size:13px}
+  .stat b{color:var(--ink)}
+  .stat .v{font-family:ui-monospace,Menlo,Consolas,monospace;color:var(--teal);font-weight:700}
+  .stat .v.red{color:var(--amber)}
+  .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .chip{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:6px 11px;border-radius:99px;cursor:pointer;font-size:12px}
+  .chip:hover{border-color:var(--blue)}
+  .chip.on{border-color:var(--teal);background:rgba(14,165,164,.14)}
+
+  .formula{background:#0a0f1a;border:1px dashed var(--line);border-radius:10px;padding:14px 16px;
+    font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;color:#cfe3ff;text-align:center;letter-spacing:.3px}
+  .formula .nota{display:block;margin-top:8px;font-size:12px;color:var(--mut);font-family:inherit;letter-spacing:0}
+
+  .frase{margin-top:8px;font-style:italic;color:var(--amber);font-size:15px}
+  .act{background:var(--blue);border:none;color:#fff;padding:11px 20px;border-radius:9px;cursor:pointer;font-size:14px;font-weight:600;margin-top:8px}
+  .act:hover{filter:brightness(1.1)}
+  .navbtns{display:flex;justify-content:space-between;margin-top:28px;gap:10px}
+  .navbtns button{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:10px 16px;border-radius:9px;cursor:pointer;font-size:13px}
+  .navbtns button:hover{border-color:var(--blue)}
+  .navbtns button:disabled{opacity:.4;cursor:not-allowed}
+  .anclas{border-top:1px solid var(--line);padding:16px 22px}
+  .anclas h3{font-size:12px;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin:0 0 8px}
+  .pill{display:inline-block;font-size:12px;padding:3px 9px;border-radius:99px;margin:2px;background:rgba(245,158,11,.1);border:1px solid var(--amber);color:#fde68a}
+  .footnote{font-size:12px;color:var(--mut)}
+  .hint{font-size:12px;color:var(--mut);margin-top:6px}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>🔬 Laboratorio de Intuiciones</h1>
+    <div class="sub">Bloque 1 · Una variable: centro, dispersión y probabilidad</div>
+  </div>
+  <div class="prog">
+    <button class="ghost" id="reset">reiniciar</button>
+    <span id="progtxt">0 / 7</span>
+    <div class="bar"><i id="progbar"></i></div>
+  </div>
+</header>
+
+<div class="rio" id="rio"></div>
+<main id="main"></main>
+
+<div class="anclas">
+  <h3>🪝 Frases ancla desbloqueadas</h3>
+  <div id="anclasBox"><span class="footnote">Aún ninguna. Recorre cada lente para coleccionarlas.</span></div>
+</div>
+
+<script>
+/* ============================================================
+   helpers matemáticos
+============================================================ */
+const sum = a => a.reduce((s,x)=>s+x,0);
+const mean = a => sum(a)/a.length;
+function median(a){
+  const s=[...a].sort((x,y)=>x-y), n=s.length, m=Math.floor(n/2);
+  return n%2 ? s[m] : (s[m-1]+s[m])/2;
+}
+const ssAround = (a,c)=>sum(a.map(x=>(x-c)*(x-c)));
+const varPop = a => ssAround(a,mean(a))/a.length;
+const varSample = a => ssAround(a,mean(a))/(a.length-1);
+const sd = a => Math.sqrt(varSample(a));
+// erf para CDF normal (Abramowitz-Stegun 7.1.26)
+function erf(x){
+  const s=x<0?-1:1; x=Math.abs(x);
+  const t=1/(1+0.3275911*x);
+  const y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);
+  return s*y;
+}
+const normCdf=(x,mu,sig)=>0.5*(1+erf((x-mu)/(sig*Math.SQRT2)));
+const normPdf=(x,mu,sig)=>Math.exp(-((x-mu)**2)/(2*sig*sig))/(sig*Math.sqrt(2*Math.PI));
+const fmt=(x,d=1)=>Number(x).toFixed(d);
+
+/* canvas con devicePixelRatio */
+function mkCanvas(host, h){
+  const c=document.createElement("canvas");
+  host.appendChild(c);
+  const dpr=window.devicePixelRatio||1;
+  const w=host.clientWidth;
+  c.style.height=h+"px"; c.width=w*dpr; c.height=h*dpr;
+  const ctx=c.getContext("2d"); ctx.scale(dpr,dpr);
+  return {c,ctx,w,h};
+}
+
+/* ============================================================
+   estado / progreso
+============================================================ */
+const STORE="labIntuicionesB1";
+let done=new Set(JSON.parse(localStorage.getItem(STORE)||"[]"));
+let anclas=JSON.parse(localStorage.getItem(STORE+"_a")||"{}");
+function save(){ localStorage.setItem(STORE,JSON.stringify([...done])); localStorage.setItem(STORE+"_a",JSON.stringify(anclas)); }
+
+/* ============================================================
+   LENTES (contenido + qué widget montar)
+============================================================ */
+const LENS=[
+{
+  id:"media", nodo:"Media", title:"Media · el centro de equilibrio",
+  need:"Una guardia repartió la carga de 6 turnos (horas): 6, 7, 6, 8, 7, 8. La jefa pregunta: «si reparto el trabajo PAREJO entre los seis, ¿cuánto le toca a cada uno?». No quiere el más alto ni el más bajo: quiere el punto donde todo queda en equilibrio.",
+  predTxt:"Si arrastro un turno hacia muchas más horas (un outlier), ¿qué le pasa al punto de equilibrio?",
+  pred:[{t:"Se corre hacia el dato lejano",ok:true},{t:"No se mueve, aguanta firme",ok:false},{t:"Se va al lado contrario",ok:false}],
+  predWhy:"La media es una balanza: todos los datos pesan. Un dato lejano hace palanca y arrastra el fulcro hacia él.",
+  widget:"media",
+  formula:"x̄ = (Σ xᵢ) / n",
+  formNota:"suma todos los valores y los reparte entre todos",
+  fail:"Es sensible a outliers, sesgo y colas largas. Con 1,1,1,9,9,9 la media es 5… y nadie vive cerca de 5.",
+  interp:"«Si junto todo y lo reparto por igual, ¿cuánto le toca a cada uno?» Útil cuando importa el TOTAL acumulado (gasto, calorías, tiempo).",
+  frase:"La media es el centro de equilibrio: suma todo y lo reparte entre todos."
+},
+{
+  id:"mediana", nodo:"Mediana", title:"Mediana · el centro por orden",
+  need:"Urgencias, 6 esperas (min): 10, 12, 11, 9, 13, 55. El jefe reporta «espera promedio: 18 min». Pero mira los datos: casi todos esperaron ~11, y un solo caso de 55 infló el promedio. El 18 no describe a casi nadie.",
+  predTxt:"Arrastra el caso de 55 aún más lejos. ¿Qué hace cada centro: la MEDIA y la MEDIANA?",
+  pred:[{t:"La media se dispara; la mediana casi no se mueve",ok:true},{t:"Las dos se disparan igual",ok:false},{t:"Ninguna se mueve",ok:false}],
+  predWhy:"La media pesa la magnitud del outlier; la mediana solo cuenta posiciones, así que solo avanza al siguiente dato ordenado.",
+  widget:"mediana",
+  formula:"n impar:  Mediana = x₍₍ₙ₊₁₎/₂₎     ||     n par:  Mediana = (x₍ₙ/₂₎ + x₍ₙ/₂₊₁₎) / 2",
+  formNota:"ordena los datos y toma el del medio",
+  fail:"No conviene cuando importa el total acumulado, cuando hay dos mundos separados, o cuando quieres lo más común (eso es la moda).",
+  interp:"«Si ordeno los datos, ¿qué queda justo en medio?» Es el centro robusto: aguanta outliers y sesgo. Con datos sesgados, reporta la mediana.",
+  frase:"La mediana parte los datos a la mitad y aguanta los outliers."
+},
+{
+  id:"varianza", nodo:"Varianza", title:"Varianza · tensión cuadrada alrededor del centro",
+  need:"Dos pacientes, misma presión MEDIA (120). Uno marca 119,120,121,120 (estable); el otro 95,145,100,140 (oscila feo). La media no los distingue: necesitas medir QUÉ TAN LEJOS del centro viven los datos.",
+  predTxt:"Si sumo las desviaciones con su signo (xᵢ − x̄), ¿cuánto da alrededor de la media?",
+  pred:[{t:"Siempre da cero",ok:true},{t:"Da la dispersión total",ok:false},{t:"Da un número negativo",ok:false}],
+  predWhy:"Los de un lado cancelan a los de otro: por eso elevamos al cuadrado, para que toda desviación sume positivo. Activa «al cuadrado» y míralo.",
+  widget:"varianza",
+  formula:"poblacional:  σ² = Σ(xᵢ − μ)² / N     ||     muestral:  s² = Σ(xᵢ − x̄)² / (n − 1)",
+  formNota:"promedio de los cuadrados de las distancias al centro",
+  fail:"Queda en unidades CUADRADAS (mmHg², min²): difícil de interpretar directo. Por eso nace la desviación estándar.",
+  interp:"La media es un poste; cada dato, una liga tensa hacia él. La varianza es la tensión cuadrada acumulada.",
+  frase:"La varianza mide tensión cuadrada alrededor del centro."
+},
+{
+  id:"nm1", nodo:"n−1", title:"n−1 · la corrección del sesgo",
+  need:"No puedes medir la glucosa de TODA la población (eso sería μ, σ² reales). Solo tomas una muestra. Pero al calcular su varianza usas la media DE LA MUESTRA… que está ajustada justo a esos datos. Resultado: subestimas la dispersión real.",
+  predTxt:"Toma muchas muestras. Dividiendo entre n, el promedio de las varianzas estimadas, comparado con la verdadera σ²…",
+  pred:[{t:"Queda por DEBAJO (subestima)",ok:true},{t:"Queda por encima",ok:false},{t:"Cae justo encima",ok:false}],
+  predWhy:"La media muestral minimiza la suma de cuadrados de SUS datos, así que / n se queda corto. Dividir entre n−1 lo levanta justo a la verdad, en promedio.",
+  widget:"nm1",
+  formula:"E[ Σ(xᵢ − x̄)² ] = (n − 1) · σ²",
+  formNota:"la suma de cuadrados contiene, en promedio, n−1 unidades de varianza",
+  fail:"n−1 NO arregla una muestra mala o no representativa. Solo corrige el sesgo de haber calculado la media desde esos mismos datos, bajo muestreo aleatorio.",
+  interp:"En población describes TODO el mundo → divides entre N. En muestra estimas un mundo oculto → divides entre n−1.",
+  frase:"n−1 corrige el sesgo de calcular la media desde la misma muestra; no vuelve buena a una muestra mala."
+},
+{
+  id:"sd", nodo:"SD", title:"Desviación estándar · la distancia típica",
+  need:"Le dices a un colega que la varianza de un examen es «225 puntos al cuadrado». Te mira raro: nadie piensa en puntos². Quieres volver a las unidades originales para decir, en simple, qué tan lejos del centro vive un alumno típico.",
+  predTxt:"Para volver de unidades² a unidades normales, ¿qué operación deshace el cuadrado?",
+  pred:[{t:"La raíz cuadrada",ok:true},{t:"Dividir entre n",ok:false},{t:"Restar la media",ok:false}],
+  predWhy:"√(varianza) = desviación estándar, de vuelta en las unidades originales. Aparece la banda ±1 SD: ahí vive el dato típico.",
+  widget:"sd",
+  formula:"s = √(s²) = √( Σ(xᵢ − x̄)² / (n − 1) )",
+  formNota:"la raíz de la varianza, de vuelta en las unidades originales",
+  fail:"Sigue heredando la sensibilidad de la varianza a outliers (todo viene de cuadrados de distancias).",
+  interp:"Si x̄ = 100 y s = 15, un dato típico vive a unos 15 del centro. La SD dice qué tan lejos del centro vive un dato típico.",
+  frase:"La SD dice qué tan lejos del centro vive un dato típico."
+},
+{
+  id:"normal", nodo:"Normal / z", title:"Normal y z-score · posición medida en SD",
+  need:"Glucosa en ayunas en sanos ≈ normal con μ=90, σ=10 mg/dL. Llega un paciente con 115. ¿Es «raro»? «115» suelto no dice nada: necesitas una regla universal para ubicar cualquier valor dentro de su curva.",
+  predTxt:"Mueve el valor del paciente. ¿Qué te dice el z-score?",
+  pred:[{t:"A cuántas SD está por encima/debajo de la media",ok:true},{t:"La probabilidad exacta del valor",ok:false},{t:"El valor menos la varianza",ok:false}],
+  predWhy:"z = (x − μ)/σ traduce cualquier valor a «número de desviaciones estándar» desde el centro. 115 con μ=90, σ=10 da z=2.5: bastante lejos.",
+  widget:"normal",
+  formula:"z = (x − μ) / σ        ±1σ≈68%   ±2σ≈95%   ±3σ≈99.7%   (±1.96σ≈95%)",
+  formNota:"el área total bajo la curva vale 1 = 100%",
+  fail:"Todo esto asume que la distribución es aproximadamente normal. Con datos muy sesgados o bimodales, el z y los 68/95/99.7 engañan.",
+  interp:"El z-score dice cuántas desviaciones estándar está un dato por encima o por debajo de la media. Es posición, no valor crudo.",
+  frase:"El z-score es la posición de un dato medida en desviaciones estándar."
+},
+{
+  id:"area", nodo:"Área", title:"Área bajo la curva · probabilidad e integral",
+  need:"Quieres responder: «¿qué probabilidad hay de que la glucosa de un sano caiga entre 80 y 100?». En una variable continua la probabilidad NO vive en la altura de la curva en un punto: vive en el ÁREA bajo el tramo.",
+  predTxt:"Aproximamos el área con rectángulos (Riemann). Si uso MÁS rectángulos, más finos, el área estimada…",
+  pred:[{t:"Se acerca cada vez más al área exacta",ok:true},{t:"Se aleja del valor real",ok:false},{t:"No cambia nunca",ok:false}],
+  predWhy:"Rectángulos más finos = menos hueco entre la escalera y la curva. En el límite (infinitos pedacitos) aparece el área exacta: eso es la integral.",
+  widget:"area",
+  formula:"P(a ≤ X ≤ b) = ∫ₐᵇ f(x) dx  ≈  Σ f(xᵢ)·Δx",
+  formNota:"sumar infinitos pedacitos de área bajo la curva de densidad",
+  fail:"Solo aplica a variables continuas con una densidad. En discretas la probabilidad sí vive en puntos (barras), no en área.",
+  interp:"En variables continuas, área = probabilidad. La integral nace como suma de pedacitos cada vez más finos hasta el área exacta.",
+  frase:"En variables continuas, el área bajo la curva ES la probabilidad."
+}
+];
+
+/* ============================================================
+   WIDGETS interactivos
+============================================================ */
+// ---- DotLine: línea numérica con puntos arrastrables (media/mediana/varianza/sd)
+function dotLine(host, opts){
+  // opts: data[], min, max, unit, mostrarMedia, mostrarMediana, mostrarLigas, sdBanda, modoVar
+  const {ctx,w,h}=mkCanvas(host, 230);
+  const pad=46, baseY=150;
+  const x2px=v=>pad+(v-opts.min)/(opts.max-opts.min)*(w-2*pad);
+  const px2x=p=>opts.min+(p-pad)/(w-2*pad)*(opts.max-opts.min);
+  let cuad = opts.modoVar ? "sq" : null; // "raw" | "sq"
+  let drag=-1;
+  const ro=host.parentElement.querySelector(".readout");
+  const chipRow=host.parentElement.querySelector(".chips");
+
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    const m=mean(opts.data), md=median(opts.data), s=sd(opts.data);
+    // eje
+    ctx.strokeStyle="#2a3550"; ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(pad,baseY); ctx.lineTo(w-pad,baseY); ctx.stroke();
+    ctx.fillStyle="#93a0bd"; ctx.font="11px ui-monospace,monospace";
+    for(let v=opts.min; v<=opts.max; v+=opts.step){
+      const px=x2px(v);
+      ctx.strokeStyle="#1d2740"; ctx.beginPath(); ctx.moveTo(px,baseY-4); ctx.lineTo(px,baseY+4); ctx.stroke();
+      ctx.fillText(v, px-6, baseY+18);
+    }
+    ctx.fillText(opts.unit, w-pad-6, baseY+34);
+    // banda ±1 SD
+    if(opts.sdBanda){
+      ctx.fillStyle="rgba(14,165,164,.14)";
+      ctx.fillRect(x2px(m-s),baseY-92,x2px(m+s)-x2px(m-s),92);
+      ctx.strokeStyle="#0ea5a4"; ctx.setLineDash([4,4]);
+      ctx.strokeRect(x2px(m-s),baseY-92,x2px(m+s)-x2px(m-s),92); ctx.setLineDash([]);
+      ctx.fillStyle="#5eead4"; ctx.fillText("±1 SD", x2px(m)+(x2px(m+s)-x2px(m))/2-16, baseY-96);
+    }
+    // ligas + cuadrados (varianza)
+    if(opts.mostrarLigas){
+      opts.data.forEach(v=>{
+        const px=x2px(v), pm=x2px(m), dev=v-m, devpx=px-pm;
+        ctx.strokeStyle = dev>=0 ? "rgba(34,197,94,.6)":"rgba(239,68,68,.6)";
+        ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(pm,baseY); ctx.lineTo(px,baseY); ctx.stroke();
+        if(cuad==="sq"){
+          const side=Math.abs(devpx);
+          ctx.fillStyle = dev>=0 ? "rgba(34,197,94,.18)":"rgba(239,68,68,.18)";
+          ctx.strokeStyle = dev>=0 ? "rgba(34,197,94,.5)":"rgba(239,68,68,.5)";
+          const x0=Math.min(px,pm);
+          ctx.fillRect(x0, baseY-side, side, side);
+          ctx.strokeRect(x0, baseY-side, side, side);
+        }
+      });
+    }
+    // marcador media (fulcro/triángulo)
+    if(opts.mostrarMedia){
+      const pm=x2px(m);
+      ctx.fillStyle="#f59e0b";
+      ctx.beginPath(); ctx.moveTo(pm,baseY+6); ctx.lineTo(pm-9,baseY+24); ctx.lineTo(pm+9,baseY+24); ctx.closePath(); ctx.fill();
+      ctx.fillText("media", pm-15, baseY+40);
+    }
+    // marcador mediana
+    if(opts.mostrarMediana){
+      const pmd=x2px(md);
+      ctx.strokeStyle="#8b5cf6"; ctx.lineWidth=2;
+      ctx.beginPath(); ctx.moveTo(pmd,baseY-30); ctx.lineTo(pmd,baseY+30); ctx.stroke();
+      ctx.fillStyle="#c4b5fd"; ctx.fillText("mediana", pmd-22, baseY-36);
+    }
+    // puntos
+    opts.data.forEach((v,i)=>{
+      const px=x2px(v);
+      ctx.fillStyle = i===drag ? "#bfdbfe":"#3b82f6";
+      ctx.beginPath(); ctx.arc(px, baseY, 9, 0, 7); ctx.fill();
+      ctx.strokeStyle="#0a0f1a"; ctx.lineWidth=2; ctx.stroke();
+    });
+    // readout
+    let html=`<span class="stat">media <span class="v red">${fmt(m)}</span></span>`;
+    if(opts.mostrarMediana) html+=`<span class="stat">mediana <span class="v">${fmt(md)}</span></span>`;
+    if(opts.mostrarLigas){
+      html+=`<span class="stat">Σ desviaciones <span class="v">${fmt(sum(opts.data.map(v=>v-m)),2)}</span></span>`;
+      html+=`<span class="stat">varianza s² <span class="v">${fmt(varSample(opts.data))}</span></span>`;
+    }
+    if(opts.sdBanda) html+=`<span class="stat">SD s <span class="v">${fmt(s)}</span></span>`;
+    ro.innerHTML=html;
+  }
+  // interacción
+  function pos(e){ const r=host.getBoundingClientRect(); return {x:e.clientX-r.left,y:e.clientY-r.top}; }
+  host.addEventListener("pointerdown",e=>{
+    const {x,y}=pos(e); let best=-1,bd=18;
+    opts.data.forEach((v,i)=>{ const d=Math.abs(x2px(v)-x); if(d<bd){bd=d;best=i;} });
+    if(best>=0){ drag=best; host.setPointerCapture(e.pointerId); draw(); }
+  });
+  host.addEventListener("pointermove",e=>{
+    if(drag<0) return;
+    const {x}=pos(e); let v=px2x(x);
+    v=Math.max(opts.min,Math.min(opts.max,Math.round(v)));
+    opts.data[drag]=v; draw();
+  });
+  host.addEventListener("pointerup",()=>{drag=-1;draw();});
+  host.addEventListener("pointercancel",()=>{drag=-1;draw();});
+  // chips
+  if(chipRow){
+    if(opts.presets) opts.presets.forEach(p=>{
+      const b=document.createElement("button"); b.className="chip"; b.textContent=p.label;
+      b.onclick=()=>{ opts.data=[...p.data]; draw(); }; chipRow.appendChild(b);
+    });
+    if(opts.modoVar){
+      const mk=(label,val)=>{const b=document.createElement("button");b.className="chip"+(cuad===val?" on":"");b.textContent=label;
+        b.onclick=()=>{cuad=val;[...chipRow.querySelectorAll(".chip")].forEach(c=>{if(c.dataset.cuad)c.classList.toggle("on",c.dataset.cuad===val)});draw();};
+        b.dataset.cuad=val; return b;};
+      chipRow.appendChild(mk("ver desviaciones firmadas","raw"));
+      chipRow.appendChild(mk("al cuadrado (área)","sq"));
+    }
+  }
+  host.parentElement.querySelector(".hint").textContent="Arrastra los puntos azules para mover los datos.";
+  draw();
+}
+
+// ---- sampling sim (n−1)
+function samplingSim(host){
+  const {ctx,w,h}=mkCanvas(host,230);
+  const MU=90, SIG=12, TRUE=SIG*SIG, N=6;
+  let accN=0, accN1=0, k=0;
+  const ro=host.parentElement.querySelector(".readout");
+  function randn(){ let u=0,v=0; while(!u)u=Math.random(); while(!v)v=Math.random(); return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v); }
+  const histN=[], histN1=[];
+  function muestra(times){
+    for(let t=0;t<times;t++){
+      const s=Array.from({length:N},()=>MU+SIG*randn());
+      const m=mean(s), ss=ssAround(s,m);
+      accN+=ss/N; accN1+=ss/(N-1); k++;
+      histN.push(accN/k); histN1.push(accN1/k);
+    }
+    draw();
+  }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    const pad=44, top=20, bot=h-30, loV=TRUE*0.4, hiV=TRUE*1.6;
+    const y=v=>bot-(v-loV)/(hiV-loV)*(bot-top);
+    // línea verdad
+    ctx.strokeStyle="#22c55e"; ctx.setLineDash([5,4]); ctx.lineWidth=2;
+    ctx.beginPath(); ctx.moveTo(pad,y(TRUE)); ctx.lineTo(w-12,y(TRUE)); ctx.stroke(); ctx.setLineDash([]);
+    ctx.fillStyle="#86efac"; ctx.font="11px ui-monospace,monospace";
+    ctx.fillText("σ² real = "+TRUE, w-150, y(TRUE)-6);
+    // curvas running
+    const plot=(hist,color)=>{ if(hist.length<2)return; ctx.strokeStyle=color; ctx.lineWidth=2; ctx.beginPath();
+      hist.forEach((v,i)=>{ const px=pad+i/(Math.max(hist.length-1,1))*(w-pad-12); const py=Math.max(top,Math.min(bot,y(v)));
+        i?ctx.lineTo(px,py):ctx.moveTo(px,py); }); ctx.stroke(); };
+    plot(histN,"#f59e0b"); plot(histN1,"#3b82f6");
+    ctx.fillStyle="#fbbf24"; ctx.fillText("÷ n  (subestima)", pad, top+4);
+    ctx.fillStyle="#93c5fd"; ctx.fillText("÷ n−1  (corrige)", pad, top+20);
+    ro.innerHTML=`<span class="stat">muestras <span class="v">${k}</span></span>`
+      +`<span class="stat">prom. ÷n <span class="v red">${k?fmt(accN/k):"—"}</span></span>`
+      +`<span class="stat">prom. ÷n−1 <span class="v">${k?fmt(accN1/k):"—"}</span></span>`
+      +`<span class="stat">verdad σ² <span class="v">${TRUE}</span></span>`;
+  }
+  const cr=host.parentElement.querySelector(".chips");
+  [["tomar 1 muestra (n=6)",1],["tomar 50 muestras",50],["reiniciar sim",0]].forEach(([l,n])=>{
+    const b=document.createElement("button"); b.className="chip"; b.textContent=l;
+    b.onclick=()=>{ if(n===0){accN=accN1=k=0;histN.length=0;histN1.length=0;draw();} else muestra(n); };
+    cr.appendChild(b);
+  });
+  host.parentElement.querySelector(".hint").textContent="Cada muestra toma 6 valores de una población oculta (σ²=144). Mira hacia dónde tiende cada promedio.";
+  draw();
+}
+
+// ---- normal + z
+function normalZ(host){
+  const {ctx,w,h}=mkCanvas(host,250);
+  const MU=90, SIG=10, lo=MU-4*SIG, hi=MU+4*SIG, pad=10, base=h-34, top=18;
+  let xv=115; let bands=false;
+  const ro=host.parentElement.querySelector(".readout");
+  const x2px=x=>pad+(x-lo)/(hi-lo)*(w-2*pad);
+  const peak=normPdf(MU,MU,SIG);
+  const y2px=d=>base-d/peak*(base-top);
+  function curve(x){ return y2px(normPdf(x,MU,SIG)); }
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    // bandas 68/95/99.7
+    if(bands){
+      const cols=["rgba(34,197,94,.16)","rgba(59,130,246,.12)","rgba(139,92,246,.10)"];
+      [1,2,3].forEach(k=>{ ctx.fillStyle=cols[k-1];
+        ctx.beginPath(); ctx.moveTo(x2px(MU-k*SIG),base);
+        for(let x=MU-k*SIG;x<=MU+k*SIG;x+=1) ctx.lineTo(x2px(x),curve(x));
+        ctx.lineTo(x2px(MU+k*SIG),base); ctx.closePath(); ctx.fill(); });
+    }
+    // área a la izquierda de xv
+    ctx.fillStyle="rgba(245,158,11,.22)";
+    ctx.beginPath(); ctx.moveTo(x2px(lo),base);
+    for(let x=lo;x<=xv;x+=1) ctx.lineTo(x2px(x),curve(x));
+    ctx.lineTo(x2px(xv),base); ctx.closePath(); ctx.fill();
+    // curva
+    ctx.strokeStyle="#cfe3ff"; ctx.lineWidth=2; ctx.beginPath();
+    for(let x=lo;x<=hi;x+=1){ const px=x2px(x),py=curve(x); x===lo?ctx.moveTo(px,py):ctx.lineTo(px,py); } ctx.stroke();
+    // eje
+    ctx.strokeStyle="#2a3550"; ctx.beginPath(); ctx.moveTo(pad,base); ctx.lineTo(w-pad,base); ctx.stroke();
+    ctx.fillStyle="#93a0bd"; ctx.font="11px ui-monospace,monospace";
+    for(let k=-3;k<=3;k++){ const x=MU+k*SIG; ctx.fillText(x, x2px(x)-8, base+16); }
+    // línea media
+    ctx.strokeStyle="#475569"; ctx.setLineDash([3,3]); ctx.beginPath(); ctx.moveTo(x2px(MU),base); ctx.lineTo(x2px(MU),top); ctx.stroke(); ctx.setLineDash([]);
+    // línea valor
+    ctx.strokeStyle="#f59e0b"; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x2px(xv),base); ctx.lineTo(x2px(xv),curve(xv)-2); ctx.stroke();
+    const z=(xv-MU)/SIG, pct=normCdf(xv,MU,SIG)*100;
+    ro.innerHTML=`<span class="stat">valor x <span class="v red">${xv}</span></span>`
+      +`<span class="stat">z <span class="v">${fmt(z,2)}</span></span>`
+      +`<span class="stat">percentil <span class="v">${fmt(pct)}%</span></span>`
+      +`<span class="stat">μ=90 · σ=10</span>`;
+  }
+  const cont=host.parentElement.querySelector(".controls");
+  cont.innerHTML=`<div class="ctl">valor del paciente (mg/dL): <input type="range" min="${lo}" max="${hi}" value="${xv}" id="xr"></div>`;
+  cont.querySelector("#xr").addEventListener("input",e=>{ xv=+e.target.value; draw(); });
+  const cr=host.parentElement.querySelector(".chips");
+  const b=document.createElement("button"); b.className="chip"; b.textContent="mostrar 68 / 95 / 99.7%";
+  b.onclick=()=>{ bands=!bands; b.classList.toggle("on",bands); draw(); }; cr.appendChild(b);
+  host.parentElement.querySelector(".hint").textContent="Mueve el valor: el z dice a cuántas SD está del centro; el área sombreada es el percentil.";
+  draw();
+}
+
+// ---- área / Riemann
+function areaRiemann(host){
+  const {ctx,w,h}=mkCanvas(host,250);
+  const MU=90, SIG=10, lo=MU-4*SIG, hi=MU+4*SIG, pad=10, base=h-34, top=18;
+  let a=80, b=100, Nr=6;
+  const ro=host.parentElement.querySelector(".readout");
+  const x2px=x=>pad+(x-lo)/(hi-lo)*(w-2*pad);
+  const peak=normPdf(MU,MU,SIG); const y2px=d=>base-d/peak*(base-top);
+  const curve=x=>y2px(normPdf(x,MU,SIG));
+  function draw(){
+    ctx.clearRect(0,0,w,h);
+    // rectángulos
+    const dx=(b-a)/Nr;
+    for(let i=0;i<Nr;i++){ const x0=a+i*dx, mid=x0+dx/2, py=curve(mid);
+      ctx.fillStyle="rgba(59,130,246,.25)"; ctx.strokeStyle="rgba(59,130,246,.7)";
+      ctx.fillRect(x2px(x0),py,x2px(x0+dx)-x2px(x0),base-py);
+      ctx.strokeRect(x2px(x0),py,x2px(x0+dx)-x2px(x0),base-py); }
+    // curva
+    ctx.strokeStyle="#cfe3ff"; ctx.lineWidth=2; ctx.beginPath();
+    for(let x=lo;x<=hi;x+=1){ const px=x2px(x),py=curve(x); x===lo?ctx.moveTo(px,py):ctx.lineTo(px,py);} ctx.stroke();
+    ctx.strokeStyle="#2a3550"; ctx.beginPath(); ctx.moveTo(pad,base); ctx.lineTo(w-pad,base); ctx.stroke();
+    ctx.fillStyle="#93a0bd"; ctx.font="11px ui-monospace,monospace";
+    [a,b].forEach(v=>ctx.fillText(v, x2px(v)-8, base+16));
+    let approx=0; const dx2=(b-a)/Nr; for(let i=0;i<Nr;i++){const mid=a+(i+.5)*dx2; approx+=normPdf(mid,MU,SIG)*dx2;}
+    const exact=normCdf(b,MU,SIG)-normCdf(a,MU,SIG);
+    ro.innerHTML=`<span class="stat">rectángulos <span class="v">${Nr}</span></span>`
+      +`<span class="stat">área aprox <span class="v red">${fmt(approx*100,2)}%</span></span>`
+      +`<span class="stat">área exacta <span class="v">${fmt(exact*100,2)}%</span></span>`
+      +`<span class="stat">P(${a}≤glucosa≤${b})</span>`;
+  }
+  const cont=host.parentElement.querySelector(".controls");
+  cont.innerHTML=`<div class="ctl">desde a: <input type="range" min="${lo}" max="${MU}" value="${a}" id="ar"></div>`
+    +`<div class="ctl">hasta b: <input type="range" min="${MU}" max="${hi}" value="${b}" id="br"></div>`
+    +`<div class="ctl">nº rectángulos: <input type="range" min="1" max="60" value="${Nr}" id="nr"></div>`;
+  cont.querySelector("#ar").oninput=e=>{a=Math.min(+e.target.value,b-2);draw();};
+  cont.querySelector("#br").oninput=e=>{b=Math.max(+e.target.value,a+2);draw();};
+  cont.querySelector("#nr").oninput=e=>{Nr=+e.target.value;draw();};
+  host.parentElement.querySelector(".hint").textContent="Sube el nº de rectángulos: el área aproximada se pega a la exacta. Eso es la integral.";
+  draw();
+}
+
+const WIDGETS={
+  media:h=>dotLine(h,{data:[6,7,6,8,7,8],min:0,max:24,step:4,unit:"horas",mostrarMedia:true,
+    presets:[{label:"caso 1,1,1,9,9,9 (media engaña)",data:[1,1,1,9,9,9]}]}),
+  mediana:h=>dotLine(h,{data:[10,12,11,9,13,55],min:0,max:60,step:10,unit:"min",mostrarMedia:true,mostrarMediana:true,
+    presets:[{label:"sin el outlier",data:[10,12,11,9,13,14]},{label:"outlier extremo",data:[10,12,11,9,13,55]}]}),
+  varianza:h=>dotLine(h,{data:[95,145,100,140],min:80,max:160,step:10,unit:"mmHg",mostrarMedia:true,mostrarLigas:true,modoVar:true,
+    presets:[{label:"paciente estable",data:[119,120,121,120]},{label:"paciente que oscila",data:[95,145,100,140]}]}),
+  nm1:h=>samplingSim(h),
+  sd:h=>dotLine(h,{data:[70,85,100,115,130],min:40,max:160,step:20,unit:"puntos",mostrarMedia:true,sdBanda:true}),
+  normal:h=>normalZ(h),
+  area:h=>areaRiemann(h)
+};
+
+/* ============================================================
+   render
+============================================================ */
+let cur=0;
+function renderRio(){
+  const r=document.getElementById("rio"); r.innerHTML="";
+  LENS.forEach((L,i)=>{
+    if(i) r.insertAdjacentHTML("beforeend",'<span class="flecha">→</span>');
+    r.insertAdjacentHTML("beforeend",
+      `<span class="nodo ${i===cur?'active':''}" data-i="${i}">${L.nodo}${done.has(L.id)?'<span class="ok">✓</span>':''}</span>`);
+  });
+  r.querySelectorAll(".nodo").forEach(n=>n.onclick=()=>{cur=+n.dataset.i;render();});
+}
+function renderProg(){
+  document.getElementById("progtxt").textContent=`${done.size} / ${LENS.length}`;
+  document.getElementById("progbar").style.width=(done.size/LENS.length*100)+"%";
+}
+function renderAnclas(){
+  const box=document.getElementById("anclasBox"); const it=Object.values(anclas);
+  box.innerHTML= it.length? it.map(f=>`<span class="pill">🪝 ${f}</span>`).join("")
+    : '<span class="footnote">Aún ninguna. Recorre cada lente para coleccionarlas.</span>';
+}
+function render(){
+  renderRio(); renderProg();
+  const L=LENS[cur], m=document.getElementById("main");
+  const solved=done.has(L.id);
+  m.innerHTML=`
+    <span class="tag">Lente ${cur+1} de ${LENS.length}</span>
+    <h2>${L.title}</h2>
+
+    <div class="fase need"><h3>① La necesidad (escenario real)</h3><div class="esc">${L.need}</div></div>
+
+    <div class="fase pred"><h3>② Predice — antes de tocar nada</h3>
+      <p>${L.predTxt}</p>
+      <div class="opts" id="pred">${L.pred.map((p,i)=>`<button data-i="${i}">${p.t}</button>`).join("")}</div>
+      <div class="pred-fb" id="predfb"></div>
+    </div>
+
+    <div class="fase sim"><h3>③ Simula — manipula y observa</h3>
+      <div class="lab">
+        <div class="host"></div>
+        <div class="controls"></div>
+        <div class="chips"></div>
+        <div class="readout"></div>
+        <div class="hint"></div>
+      </div>
+    </div>
+
+    <div class="fase form"><h3>④ La forma matemática (emerge ahora)</h3>
+      <div class="formula">${L.formula}<span class="nota">${L.formNota}</span></div>
+    </div>
+
+    <div class="fase fail"><h3>⑤ Cuándo engaña</h3><p>${L.fail}</p></div>
+
+    <div class="fase interp"><h3>⑥ Interpretación real</h3><p>${L.interp}</p>
+      <div class="frase">🪝 «${L.frase}»</div>
+      <button class="act" id="marcar">${solved?'✓ Repasada — marcar de nuevo':'Marcar lente como repasada ▶'}</button>
+    </div>
+
+    <div class="navbtns">
+      <button id="prev" ${cur===0?'disabled':''}>← anterior</button>
+      <button id="next" ${cur===LENS.length-1?'disabled':''}>siguiente →</button>
+    </div>`;
+
+  // predicción
+  m.querySelectorAll("#pred button").forEach(b=>b.onclick=()=>{
+    m.querySelectorAll("#pred button").forEach(x=>x.classList.remove("sel"));
+    b.classList.add("sel");
+    const ok=L.pred[+b.dataset.i].ok, fb=document.getElementById("predfb");
+    fb.className="pred-fb show";
+    fb.innerHTML=(ok?"✅ Esa es la corazonada correcta. ":"🤔 No del todo. ")+L.predWhy;
+  });
+  // widget
+  WIDGETS[L.widget](m.querySelector(".host"));
+  // marcar
+  document.getElementById("marcar").onclick=()=>{ done.add(L.id); anclas[L.id]=L.frase; save();
+    renderProg(); renderRio(); renderAnclas();
+    if(cur<LENS.length-1){ cur++; render(); window.scrollTo({top:0,behavior:"smooth"}); } };
+  document.getElementById("prev").onclick=()=>{cur--;render();window.scrollTo({top:0});};
+  document.getElementById("next").onclick=()=>{cur++;render();window.scrollTo({top:0});};
+}
+document.getElementById("reset").onclick=()=>{ if(!confirm("¿Borrar el progreso?"))return;
+  done=new Set(); anclas={}; save(); renderProg(); renderAnclas(); render(); };
+
+let rt; window.addEventListener("resize",()=>{clearTimeout(rt);rt=setTimeout(render,200);});
+renderAnclas(); render();
+</script>
+</body>
+</html>
