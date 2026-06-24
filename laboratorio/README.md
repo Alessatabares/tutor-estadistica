@@ -88,3 +88,19 @@ Más dos secciones de referencia: **🔧 Desarme** (clicas cada pieza de varianz
 z / Pearson y ves qué hace y en qué unidades queda) y **📓 Cuaderno** (tabla
 símbolo → traducción → imagen). Numéricos: auto-check con tolerancia. Traducciones:
 escribes, revelas la canónica y te auto-marcas. Progreso en `localStorage`.
+
+## El Ojo Estadístico (`ojo-estadistico.html`)
+
+Tercer complemento, de **aplicación**: los laboratorios enseñan *qué es* cada lente;
+el gimnasio enseña a *leer la fórmula*; este entrena el **criterio de modelado** —
+ver qué lente pide cada situación de la vida real. Es la meta del repo ("ver
+estadística en todo") hecha juego.
+
+**Mecánica:** un escenario random (médico, de investigación, de rutina o francamente
+absurdo: calcetines que desaparecen, un gato que maúlla 47 veces, OVNIs, un dado
+cargado, zombies) y dos decisiones: **¿qué lente?** y **¿por qué ésa y no la vecina?**.
+Cada caso carga su vecina confundible (media↔mediana, varianza↔covarianza,
+covarianza↔Pearson, z↔centro) para que entrenes el **discriminador**, no la memoria.
+Varios casos son trampa (incluida correlación ≠ causalidad). Botón **🎲 caso al azar**.
+
+28 casos; progreso propio en `localStorage`. Las frases-ancla se reusan de los labs.

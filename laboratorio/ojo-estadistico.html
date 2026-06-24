@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Ojo Estadístico · ¿qué lente uso aquí?</title>
+<style>
+  :root{
+    --bg:#0f1420; --panel:#161d2e; --panel2:#1d2740; --line:#2a3550;
+    --ink:#e7ecf5; --mut:#93a0bd; --blue:#3b82f6; --teal:#0ea5a4;
+    --green:#22c55e; --amber:#f59e0b; --red:#ef4444; --violet:#8b5cf6;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,sans-serif;
+    background:linear-gradient(180deg,#0c111c,#0f1420);color:var(--ink);line-height:1.5}
+  header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  header h1{font-size:18px;margin:0;letter-spacing:.3px}
+  header .sub{color:var(--mut);font-size:13px;max-width:640px}
+  .prog{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--mut)}
+  .bar{width:150px;height:8px;background:var(--panel2);border-radius:99px;overflow:hidden}
+  .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--violet),var(--green));transition:width .4s}
+  button.ghost{background:var(--panel2);border:1px solid var(--line);color:var(--ink);padding:7px 13px;border-radius:8px;cursor:pointer;font-size:12px}
+  button.ghost:hover{background:var(--line)}
+
+  .wrap{display:flex;min-height:calc(100vh - 90px)}
+  nav{width:230px;border-right:1px solid var(--line);padding:12px;flex-shrink:0;max-height:calc(100vh - 90px);overflow-y:auto}
+  nav button{display:block;width:100%;text-align:left;margin:0 0 5px;padding:8px 11px;border-radius:9px;
+    background:transparent;border:1px solid transparent;color:var(--ink);cursor:pointer;font-size:12.5px;transition:.15s}
+  nav button:hover{background:var(--panel)}
+  nav button.active{background:var(--panel2);border-color:var(--line)}
+  nav button .done{color:var(--green);float:right}
+  main{flex:1;padding:24px;max-width:840px}
+  h2{margin:0 0 14px;font-size:20px}
+  .dom{display:inline-block;font-size:11px;color:var(--violet);text-transform:uppercase;letter-spacing:.8px;margin-bottom:8px}
+
+  .escena{background:#0c1322;border:1px solid var(--line);border-left:3px solid var(--violet);
+    border-radius:12px;padding:16px 18px;font-size:15px;margin:0 0 18px}
+
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:0 0 12px}
+  .step h3{margin:0 0 8px;font-size:13px;color:var(--mut)}
+  .opts{display:flex;flex-direction:column;gap:7px}
+  .opts button{text-align:left;background:var(--panel2);border:1px solid var(--line);color:var(--ink);
+    padding:10px 13px;border-radius:9px;cursor:pointer;font-size:14px;transition:.15s}
+  .opts button:hover{border-color:var(--blue)}
+  .opts button.sel{border-color:var(--amber);background:rgba(245,158,11,.12)}
+  button.act{background:var(--violet);border:none;color:#fff;padding:11px 20px;border-radius:9px;cursor:pointer;
+    font-size:14px;font-weight:600;margin-top:4px}
+  button.act:hover{filter:brightness(1.1)}
+  button.act:disabled{opacity:.5;cursor:not-allowed}
+  .attempts{font-size:12px;color:var(--mut);margin-left:12px}
+
+  .fb{margin-top:14px;padding:13px 15px;border-radius:10px;font-size:14px;display:none}
+  .fb.show{display:block}
+  .fb.good{background:rgba(34,197,94,.12);border:1px solid var(--green);color:#bbf7d0}
+  .fb.bad{background:rgba(239,68,68,.12);border:1px solid var(--red);color:#fecaca}
+  .fb.info{background:rgba(59,130,246,.12);border:1px solid var(--blue);color:#bfdbfe}
+  .fb .why{margin-top:8px;color:var(--ink);font-size:13.5px}
+  .fb .trampa{margin-top:8px;color:#fca5a5;font-size:13px}
+  .fb .frase{margin-top:10px;font-style:italic;color:var(--amber)}
+  .fb .concepto{margin-top:8px;font-size:12.5px;color:var(--mut)}
+
+  .ancla-wrap{padding:14px 24px;border-top:1px solid var(--line)}
+  .ancla-wrap h3{font-size:13px;color:var(--mut);text-transform:uppercase;letter-spacing:.8px;margin:0 0 8px}
+  .pill{display:inline-block;font-size:12px;padding:3px 9px;border-radius:99px;margin:2px;
+    background:rgba(139,92,246,.1);border:1px solid var(--violet);color:#ddd6fe}
+  .footnote{font-size:12px;color:var(--mut)}
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>👁️ El Ojo Estadístico</h1>
+    <div class="sub">Escenarios random (médicos, de investigación, de la rutina y francamente absurdos). Tú decides <b>qué lente usar</b> y <b>por qué ésa y no la vecina</b>. La meta: ver estadística en cualquier cosa.</div>
+  </div>
+  <div class="prog">
+    <button class="ghost" id="rand" title="Saltar a un caso al azar">🎲 caso al azar</button>
+    <button class="ghost" id="reset" title="Borrar progreso">reiniciar</button>
+    <span id="progtxt">0 / 0</span>
+    <div class="bar"><i id="progbar"></i></div>
+  </div>
+</header>
+
+<div class="wrap">
+  <nav id="nav"></nav>
+  <main id="main"></main>
+</div>
+
+<div class="ancla-wrap">
+  <h3>🪝 Frases ancla desbloqueadas</h3>
+  <div id="anclas"><span class="footnote">Aún ninguna. Resuelve casos para coleccionarlas.</span></div>
+</div>
+
+<script>
+const STORE_KEY="ojoEstadisticoProgress";
+let done = new Set(JSON.parse(localStorage.getItem(STORE_KEY)||"[]"));
+let anclas = JSON.parse(localStorage.getItem(STORE_KEY+"_anclas")||"{}");
+function save(){
+  localStorage.setItem(STORE_KEY, JSON.stringify([...done]));
+  localStorage.setItem(STORE_KEY+"_anclas", JSON.stringify(anclas));
+}
+const esc = s => String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+
+/* ===================== casos =====================
+   dom    = etiqueta de dominio (emoji + palabra)
+   esc    = el escenario
+   lentes = opciones de "¿qué lente?"   (una ok)
+   porques= opciones de "¿por qué ésa?" (una ok) = el discriminador
+   explica= por qué la lente correcta, atada a la señal
+   trampa = por qué la vecina engañaría aquí
+*/
+const SCN = [];
+function scn(o){ SCN.push(o); }
+
+scn({ id:"c1", dom:"🏥 urgencias",
+  esc:"El hospital dice que la espera 'promedio' es 52 min. Pero 8 de cada 10 pacientes esperan menos de 25 min; unos pocos casos críticos esperan 5+ horas. Quieres prometer un tiempo de espera típico.",
+  lentes:[{x:"Media",ok:false},{x:"Mediana",ok:true},{x:"Varianza",ok:false}],
+  porques:[{x:"Hay valores extremos (esperas de 5h) que inflan la media; la mediana los resiste",ok:true},{x:"Hay pocos pacientes",ok:false},{x:"El tiempo no es numérico",ok:false}],
+  explica:"La mediana parte la masa en dos: describe al paciente del medio sin que la cola de casos críticos la arrastre.",
+  trampa:"La media (52 min) está inflada por los casos extremos: no representa a casi nadie.",
+  frase:"La mediana es lo que resiste extremos.",
+  concepto:"Valor típico con cola larga → mediana, no media." });
+
+scn({ id:"c2", dom:"💊 farmacia",
+  esc:"Dos lotes del mismo fármaco tienen exactamente la misma concentración media. Quieres saber cuál es más consistente entre ampollas.",
+  lentes:[{x:"Media",ok:false},{x:"Desviación estándar (SD)",ok:true},{x:"Covarianza",ok:false}],
+  porques:[{x:"Es una sola variable (concentración) y preguntas por su dispersión, no por su centro",ok:true},{x:"Hay dos variables que se mueven juntas",ok:false},{x:"Quieres el valor más común",ok:false}],
+  explica:"La SD mide cuánto se alejan las ampollas de su media: a igual media, menor SD = más consistente.",
+  trampa:"La covarianza necesita DOS variables moviéndose juntas; aquí solo hay una.",
+  frase:"Misma media puede esconder dispersiones muy distintas.",
+  concepto:"Una variable + '¿qué tan consistente?' → varianza/SD." });
+
+scn({ id:"c3", dom:"🧦 lavadora",
+  esc:"Tu lavadora 'se come' calcetines. La mayoría de las cargas pierde 0, varias pierden 1, y una vez desaparecieron 7. ¿Cuál es el número MÁS COMÚN de calcetines perdidos?",
+  lentes:[{x:"Media",ok:false},{x:"Moda",ok:true},{x:"Rango",ok:false}],
+  porques:[{x:"Pides el resultado más frecuente, no el promedio ni el rango",ok:true},{x:"Porque hay un dato muy grande (7)",ok:false},{x:"Porque quieres la dispersión",ok:false}],
+  explica:"La moda es el valor que más se repite; aquí 0 es lo que pasa la mayoría de las veces.",
+  trampa:"La media saldría >0 por culpa del 7, sugiriendo que 'siempre' pierdes calcetines: falso.",
+  frase:"La moda = lo que domina por frecuencia.",
+  concepto:"'El resultado más común' → moda." });
+
+scn({ id:"c4", dom:"🐱 gato",
+  esc:"Tu gato maúlla normalmente unas 6 veces por hora. Hoy maulló 47 veces en una hora. Quieres saber qué tan raro es este día.",
+  lentes:[{x:"Media",ok:false},{x:"Z-score / percentil",ok:true},{x:"Covarianza",ok:false}],
+  porques:[{x:"Preguntas qué tan lejos está UN valor del resto: su rareza",ok:true},{x:"Quieres el maullido promedio",ok:false},{x:"Quieres relacionar dos variables",ok:false}],
+  explica:"El z-score dice a cuántas SD del maullido típico está el 47: traduce 'raro' en un número.",
+  trampa:"La media te da el 'normal' (~6) pero no mide cuán excepcional es el 47.",
+  frase:"El z-score convierte 'qué raro' en cuántas SD.",
+  concepto:"'¿Qué tan raro es este dato?' → z / percentil." });
+
+scn({ id:"c5", dom:"🍕 pizzería",
+  esc:"Sospechas que las propinas más grandes llegan cuando la pizza llega más rápido. Tienes, por pedido, la propina y el tiempo de entrega.",
+  lentes:[{x:"Covarianza",ok:true},{x:"Mediana",ok:false},{x:"SD",ok:false}],
+  porques:[{x:"Hay dos variables (propina y tiempo) y preguntas si se mueven juntas",ok:true},{x:"Hay outliers y buscas el centro",ok:false},{x:"Quieres la dispersión de una variable",ok:false}],
+  explica:"La covarianza dice si dos variables tienden a subir/bajar juntas: su signo responde la dirección.",
+  trampa:"La mediana o la SD describen una variable sola; no capturan la relación entre dos.",
+  frase:"Covarianza = ¿se mueven juntas, y en qué dirección?",
+  concepto:"Dos variables + '¿van juntas?' → covarianza (signo)." });
+
+scn({ id:"c6", dom:"🔬 investigación",
+  esc:"En 200 personas mides estatura (cm) y peso (kg). Quieres reportar qué tan FUERTE es la relación, comparable con otro estudio que la midió en pulgadas y libras.",
+  lentes:[{x:"Covarianza",ok:false},{x:"Pearson (r)",ok:true},{x:"Media",ok:false}],
+  porques:[{x:"Quieres una fuerza comparable; la covarianza cambia con las unidades (cm·kg vs in·lb)",ok:true},{x:"Solo quieres el signo",ok:false},{x:"Quieres el valor típico de estatura",ok:false}],
+  explica:"Pearson normaliza la covarianza a [−1,+1]: una fuerza sin unidades, comparable entre estudios.",
+  trampa:"La covarianza en cm·kg y en in·lb da números distintos para la MISMA relación: no comparable.",
+  frase:"Pearson = covarianza sin unidades, de −1 a +1.",
+  concepto:"'¿Qué tan fuerte, comparable?' → Pearson, no covarianza." });
+
+scn({ id:"c7", dom:"☕ café",
+  esc:"Casi todos los cafés se preparan en 3-4 min, pero el cliente que pidió 5 cafés con dibujos de espuma tardó 18. Quieres prometer un tiempo de preparación típico.",
+  lentes:[{x:"Media",ok:false},{x:"Mediana",ok:true},{x:"Varianza",ok:false}],
+  porques:[{x:"Un pedido extremo (18 min) jala la media; la mediana lo aguanta",ok:true},{x:"Solo hay un dato",ok:false},{x:"Buscas la relación entre dos variables",ok:false}],
+  explica:"La mediana ignora el 18 atípico y describe el café del medio (~3-4 min).",
+  trampa:"La media sube por el pedido de 18 min y promete más de lo real.",
+  frase:"Un outlier mueve la media, no la mediana.",
+  concepto:"Valor típico con un atípico → mediana." });
+
+scn({ id:"c8", dom:"🎮 streamer",
+  esc:"La mayoría de las donaciones son de $5, algunas de $10, y una vez alguien donó $2000. Quieres describir la donación típica de tu audiencia.",
+  lentes:[{x:"Media",ok:false},{x:"Mediana",ok:true},{x:"Pearson",ok:false}],
+  porques:[{x:"El donativo de $2000 es un outlier que infla la media",ok:true},{x:"Hay dos variables relacionadas",ok:false},{x:"Quieres relacionar donación con tiempo",ok:false}],
+  explica:"La mediana representa al donante de en medio (~$5-10), sin que la 'ballena' de $2000 la distorsione.",
+  trampa:"La media haría parecer que la donación 'típica' es enorme; es un espejismo del $2000.",
+  frase:"Pocos extremos, gran efecto en la media.",
+  concepto:"Distribución sesgada de dinero → mediana." });
+
+scn({ id:"c9", dom:"🧟 apocalipsis",
+  esc:"En el refugio cuentan cuántos zombies pasan por hora. Quieren saber si las NOCHES son más impredecibles que los días, aunque pase el mismo número en promedio.",
+  lentes:[{x:"Media",ok:false},{x:"Varianza / SD",ok:true},{x:"Covarianza",ok:false}],
+  porques:[{x:"Preguntas por la variabilidad de una variable, no por su promedio",ok:true},{x:"Quieres relacionar día con noche como dos variables",ok:false},{x:"Quieres el valor más común",ok:false}],
+  explica:"La varianza mide cuánto fluctúa el conteo: más varianza de noche = más impredecible.",
+  trampa:"La media puede ser igual día y noche y aun así ocultar que una es mucho más errática.",
+  frase:"Mismo promedio, distinta varianza = distinta sorpresa.",
+  concepto:"'¿Qué tan impredecible?' → varianza." });
+
+scn({ id:"c10", dom:"🚽 urología",
+  esc:"Dos pacientes van al baño el mismo número de veces al día EN PROMEDIO, pero uno es muy regular y el otro a veces 2 y a veces 12. ¿Qué métrica los distingue?",
+  lentes:[{x:"Media",ok:false},{x:"SD",ok:true},{x:"Moda",ok:false}],
+  porques:[{x:"Misma media; lo que cambia es la dispersión de una variable",ok:true},{x:"Cambia la relación entre dos variables",ok:false},{x:"Cambia el valor más frecuente",ok:false}],
+  explica:"La SD captura la irregularidad: el paciente errático tiene SD mucho mayor a igual media.",
+  trampa:"La media los iguala; solo la dispersión revela la diferencia clínica.",
+  frase:"La media esconde la irregularidad; la SD la muestra.",
+  concepto:"Distinguir regular vs errático → SD." });
+
+scn({ id:"c11", dom:"🎲 dado",
+  esc:"Tiras un dado 60 veces y el 6 sale 25 veces. Quieres saber qué tan raro sería esto si el dado fuera justo.",
+  lentes:[{x:"Probabilidad / área",ok:true},{x:"Media",ok:false},{x:"Covarianza",ok:false}],
+  porques:[{x:"Preguntas qué tan probable es un resultado bajo un modelo (dado justo)",ok:true},{x:"Quieres el promedio de tiradas",ok:false},{x:"Quieres relacionar dos variables",ok:false}],
+  explica:"Bajo un dado justo esperarías ~10 seises; la probabilidad de ver 25 te dice cuán sospechoso es.",
+  trampa:"La media de las caras no te dice nada sobre si 25 seises es plausible o no.",
+  frase:"'¿Qué tan probable bajo este modelo?' → probabilidad.",
+  concepto:"Comparar lo observado contra un modelo → probabilidad/área." });
+
+scn({ id:"c12", dom:"💰 empresa",
+  esc:"En una empresa de 50 personas, el CEO gana 100 veces lo que el resto. Te piden el sueldo 'típico' de un empleado.",
+  lentes:[{x:"Media",ok:false},{x:"Mediana",ok:true},{x:"Rango",ok:false}],
+  porques:[{x:"El sueldo del CEO es un outlier enorme que infla la media",ok:true},{x:"Quieres la diferencia entre el mayor y el menor",ok:false},{x:"Hay dos variables",ok:false}],
+  explica:"La mediana = el sueldo del empleado del medio, inmune al sueldo gigante del CEO.",
+  trampa:"La media sube por el CEO y exagera el sueldo 'típico': el truco clásico de los promedios.",
+  frase:"Cuando hay un gigante, usa la mediana.",
+  concepto:"Ingresos con un extremo → mediana." });
+
+scn({ id:"c13", dom:"🛸 OVNIs",
+  esc:"Los avistamientos OVNI de tu pueblo son 2-3 por mes casi siempre, pero en julio hubo 40 (coincidió con un festival de cine sci-fi). ¿Cuál es el típico mensual?",
+  lentes:[{x:"Media",ok:false},{x:"Mediana",ok:true},{x:"SD",ok:false}],
+  porques:[{x:"Julio es un outlier que infla la media; la mediana lo resiste",ok:true},{x:"Quieres saber qué tan variable es",ok:false},{x:"Quieres relacionar dos variables",ok:false}],
+  explica:"La mediana (~2-3) describe el mes normal sin que julio la dispare.",
+  trampa:"La media reparte los 40 de julio entre todos los meses, inventando avistamientos que no hubo.",
+  frase:"Un mes raro no debería redefinir lo típico: mediana.",
+  concepto:"Conteo con un pico → mediana." });
+
+scn({ id:"c14", dom:"🌡️ fiebre",
+  esc:"La temperatura corporal en sanos ronda 37°C con poca variación. Llega alguien con 38.5°C y quieres saber qué tan inusual es ese valor.",
+  lentes:[{x:"Media",ok:false},{x:"Z-score (regla 68-95)",ok:true},{x:"Covarianza",ok:false}],
+  porques:[{x:"Preguntas cuán lejos del centro está un valor individual",ok:true},{x:"Quieres el valor promedio",ok:false},{x:"Quieres relacionar temperatura con otra variable",ok:false}],
+  explica:"El z-score sitúa 38.5 a varias SD del centro: cae fuera del rango típico, por eso 'cuenta' como fiebre.",
+  trampa:"La media (37) es el centro, pero no te dice si 38.5 es 'un poco' o 'muy' raro.",
+  frase:"Rareza de un valor = cuántas SD del centro.",
+  concepto:"'¿Qué tan inusual este valor?' → z." });
+
+scn({ id:"c15", dom:"🧠 ensayo clínico",
+  esc:"Dos tratamientos logran la MISMA mejoría media. Pero el A funciona casi igual en todos, y el B a unos los cura del todo y a otros nada. ¿Qué métrica revela esa diferencia clave?",
+  lentes:[{x:"Media",ok:false},{x:"Varianza / SD",ok:true},{x:"Moda",ok:false}],
+  porques:[{x:"Misma media; lo que difiere es la dispersión de las respuestas",ok:true},{x:"Difiere el valor más frecuente",ok:false},{x:"Difiere la relación entre dos variables",ok:false}],
+  explica:"La varianza expone la heterogeneidad: el B tiene mucha más, señal de subgrupos que responden distinto.",
+  trampa:"Mirar solo la media diría que A y B son iguales y borraría una diferencia clínica enorme.",
+  frase:"Misma media, distinta varianza = pacientes distintos escondidos.",
+  concepto:"Detectar subgrupos/heterogeneidad → varianza." });
+
+scn({ id:"c16", dom:"🍷 cata",
+  esc:"Diez jueces puntúan un vino. Nueve dan 8-9; uno odió todo y puso 1. Quieres un puntaje representativo del vino.",
+  lentes:[{x:"Media",ok:false},{x:"Mediana",ok:true},{x:"Varianza",ok:false}],
+  porques:[{x:"El juez que puso 1 es un outlier que jala la media hacia abajo",ok:true},{x:"Quieres medir el desacuerdo entre jueces",ok:false},{x:"Hay dos variables",ok:false}],
+  explica:"La mediana (~8-9) refleja el consenso sin que el juez gruñón lo hunda.",
+  trampa:"La media baja por un solo juez y subrepresenta al vino.",
+  frase:"Un juez extremo no debería decidir: mediana.",
+  concepto:"Puntajes con un atípico → mediana." });
+
+scn({ id:"c17", dom:"🎰 lotería",
+  esc:"Quieres saber qué tan posible es que TU número exacto salga premiado esta semana.",
+  lentes:[{x:"Probabilidad",ok:true},{x:"Media",ok:false},{x:"SD",ok:false}],
+  porques:[{x:"Preguntas la chance de un resultado específico, no un valor central",ok:true},{x:"Quieres el premio promedio",ok:false},{x:"Quieres la dispersión de premios",ok:false}],
+  explica:"Es contar casos favorables sobre posibles: una probabilidad, no un promedio.",
+  trampa:"La media o la SD describen montos de premio, no la chance de ganar.",
+  frase:"'¿Qué chance hay?' → probabilidad.",
+  concepto:"Chance de un evento → probabilidad." });
+
+scn({ id:"c18", dom:"📱 redes",
+  esc:"Quieres saber si, persona a persona, MÁS horas en TikTok van con MENOS horas de sueño, y en qué dirección.",
+  lentes:[{x:"Covarianza",ok:true},{x:"Mediana",ok:false},{x:"Z-score",ok:false}],
+  porques:[{x:"Dos variables y preguntas si se mueven juntas (y el signo)",ok:true},{x:"Buscas el valor típico de una",ok:false},{x:"Buscas qué tan raro es un valor",ok:false}],
+  explica:"La covarianza negativa mostraría que cuando una sube la otra baja: captura la dirección de la relación.",
+  trampa:"La mediana de horas de sueño no dice nada sobre su relación con TikTok.",
+  frase:"Dirección de una relación = signo de la covarianza.",
+  concepto:"'¿Suben/bajan juntas?' → covarianza." });
+
+scn({ id:"c19", dom:"🧪 laboratorio",
+  esc:"Un test casero mide algo en 'unidades raras del aparato'. Quieres comparar su relación con el gold standard contra la relación de OTRO test medido en mg/dL.",
+  lentes:[{x:"Covarianza",ok:false},{x:"Pearson (r)",ok:true},{x:"Media",ok:false}],
+  porques:[{x:"Las unidades difieren; la covarianza no es comparable entre escalas, Pearson sí",ok:true},{x:"Solo te importa el signo",ok:false},{x:"Quieres el valor promedio del test",ok:false}],
+  explica:"Pearson es adimensional: permite comparar fuerzas de relación medidas en escalas distintas.",
+  trampa:"Comparar covarianzas en 'unidades raras' vs mg/dL es comparar peras con manzanas.",
+  frase:"Para comparar fuerzas entre escalas: Pearson.",
+  concepto:"Relación comparable entre unidades → Pearson." });
+
+scn({ id:"c20", dom:"🎤 karaoke",
+  esc:"Quieres saber si tu amigo es un cantante CONSISTENTE (siempre parecido) o muy irregular (a veces genial, a veces fatal), a partir de sus puntajes de varias noches.",
+  lentes:[{x:"Media",ok:false},{x:"SD",ok:true},{x:"Covarianza",ok:false}],
+  porques:[{x:"Es una variable (su puntaje) y preguntas por su variabilidad",ok:true},{x:"Hay dos variables que relacionar",ok:false},{x:"Quieres su puntaje promedio",ok:false}],
+  explica:"La SD mide cuánto saltan sus puntajes noche a noche: baja = consistente, alta = irregular.",
+  trampa:"Dos cantantes con la misma media pueden ser uno estable y otro impredecible; la media no lo distingue.",
+  frase:"Consistencia = SD baja.",
+  concepto:"'¿Estable o irregular?' → SD." });
+
+scn({ id:"c21", dom:"🍫 encuesta",
+  esc:"En una encuesta, la mayoría come 1 chocolate al día, varios comen 0, y una persona dijo 30. Quieres el número de chocolates más habitual.",
+  lentes:[{x:"Media",ok:false},{x:"Moda",ok:true},{x:"Rango",ok:false}],
+  porques:[{x:"Pides el valor más habitual, no el promedio ni la dispersión",ok:true},{x:"Porque hay un dato de 30",ok:false},{x:"Porque quieres el mínimo y el máximo",ok:false}],
+  explica:"La moda = el valor que más gente reportó (1).",
+  trampa:"La media se va hacia arriba por el dato de 30 y no representa a 'la mayoría'.",
+  frase:"'Lo más habitual' → moda.",
+  concepto:"Valor más frecuente → moda." });
+
+scn({ id:"c22", dom:"⛈️ clima",
+  esc:"En un mes seco, casi todos los días caen 0 mm de lluvia, pero dos días hubo tormentas torrenciales. ¿Cómo describes un día típico de ese mes?",
+  lentes:[{x:"Media",ok:false},{x:"Mediana",ok:true},{x:"Covarianza",ok:false}],
+  porques:[{x:"Dos días extremos inflan la media; la mediana refleja el día común",ok:true},{x:"Quieres relacionar lluvia con otra variable",ok:false},{x:"Quieres la variabilidad",ok:false}],
+  explica:"La mediana es 0 mm: describe el día normal sin que dos tormentas la distorsionen.",
+  trampa:"La media reparte la tormenta entre todos los días e inventa lluvia donde no la hubo.",
+  frase:"Datos casi todos en cero + picos → mediana.",
+  concepto:"Distribución con masa en cero → mediana." });
+
+scn({ id:"c23", dom:"🍦 trampa",
+  esc:"Un estudio halla que las ciudades con más heladerías tienen más ahogamientos. Un titular dice 'las heladerías causan ahogamientos'. ¿Qué puedes afirmar honestamente?",
+  lentes:[{x:"Que covarían/correlacionan, pero NO que una cause la otra",ok:true},{x:"Que las heladerías causan ahogamientos (Pearson alto = causa)",ok:false},{x:"Que no hay ninguna relación",ok:false}],
+  porques:[{x:"Puede haber una variable oculta (el calor del verano) que mueva ambas a la vez",ok:true},{x:"Porque la muestra es pequeña",ok:false},{x:"Porque las unidades no coinciden",ok:false}],
+  explica:"Una correlación fuerte mide que dos cosas se mueven juntas; una tercera variable (el verano) explica ambas.",
+  trampa:"Leer un Pearson alto como prueba de causa es el error clásico: ignora las variables confusoras.",
+  frase:"Correlación ≠ causalidad: ojo con la variable oculta.",
+  concepto:"Relación fuerte NO autoriza a afirmar causa." });
+
+scn({ id:"c24", dom:"🛏️ medicina",
+  esc:"En residentes mides horas de sueño y número de errores por turno. Quieres reportar qué tan fuerte (y en qué dirección) se relacionan, comparable con otros hospitales.",
+  lentes:[{x:"Covarianza",ok:false},{x:"Pearson (r)",ok:true},{x:"Mediana",ok:false}],
+  porques:[{x:"Quieres una fuerza comparable entre centros; Pearson es adimensional",ok:true},{x:"Solo quieres el valor típico de sueño",ok:false},{x:"Solo te importa cuántos datos hay",ok:false}],
+  explica:"Pearson da una fuerza estandarizada y con signo (negativa aquí), comparable entre hospitales de distintas escalas.",
+  trampa:"La covarianza dependería de las unidades de cada hospital y no sería comparable.",
+  frase:"Fuerza comparable de una relación → Pearson.",
+  concepto:"Relación fuerte + comparable → Pearson." });
+
+scn({ id:"c25", dom:"🗣️ nervios",
+  esc:"Grabas tus exposiciones y registras, por minuto, cuántas veces dices 'eh' y tus pulsaciones. Quieres ver si tu nerviosismo y tus muletillas suben juntos.",
+  lentes:[{x:"Covarianza",ok:true},{x:"Media",ok:false},{x:"Percentil",ok:false}],
+  porques:[{x:"Dos variables medidas en paralelo y preguntas si covarían",ok:true},{x:"Quieres el promedio de 'eh'",ok:false},{x:"Quieres qué tan raro es un minuto",ok:false}],
+  explica:"La covarianza (positiva) mostraría que los minutos con más pulsaciones traen más 'eh': se mueven juntos.",
+  trampa:"El promedio de 'eh' no dice si dependen de tu pulso o no.",
+  frase:"Dos series en paralelo + '¿juntas?' → covarianza.",
+  concepto:"Co-movimiento de dos variables → covarianza." });
+
+scn({ id:"c26", dom:"🐶 parque",
+  esc:"En el parque hay diez chihuahuas y un gran danés enorme. Quieres describir el peso típico de un perro del parque.",
+  lentes:[{x:"Media",ok:false},{x:"Mediana",ok:true},{x:"SD",ok:false}],
+  porques:[{x:"El gran danés es un outlier que infla la media",ok:true},{x:"Quieres la variabilidad de pesos",ok:false},{x:"Hay dos variables",ok:false}],
+  explica:"La mediana toma el peso del perro del medio (un chihuahua), no contaminado por el gran danés.",
+  trampa:"La media sube por el gran danés y sugiere perros más pesados de lo que son.",
+  frase:"Un gigante entre enanos → mediana.",
+  concepto:"Tamaños con un extremo → mediana." });
+
+scn({ id:"c27", dom:"🐦 pájaros",
+  esc:"En un cable suele haber 8-12 pájaros, con poca variación. Hoy hay 30 y quieres decir si eso está 'fuera de lo normal'.",
+  lentes:[{x:"Media",ok:false},{x:"Z-score / regla 68-95",ok:true},{x:"Covarianza",ok:false}],
+  porques:[{x:"Preguntas si un valor cae dentro o fuera del rango típico",ok:true},{x:"Quieres el número promedio de pájaros",ok:false},{x:"Quieres relacionar con otra variable",ok:false}],
+  explica:"La regla 68-95 marca el rango esperable alrededor de la media; 30 cae muy fuera, así que es anómalo.",
+  trampa:"La media (~10) no te dice si 30 está apenas afuera o disparatadamente afuera.",
+  frase:"'¿Dentro o fuera de lo normal?' → z / 68-95.",
+  concepto:"Juzgar la normalidad de un valor → z." });
+
+scn({ id:"c28", dom:"🍔 comida",
+  esc:"Tienes 40 combos de comida rápida con su precio y sus calorías. Quieres saber si los más caros tienden a tener más calorías.",
+  lentes:[{x:"Covarianza / Pearson",ok:true},{x:"Mediana",ok:false},{x:"Moda",ok:false}],
+  porques:[{x:"Dos variables (precio y calorías) y preguntas si van juntas",ok:true},{x:"Buscas el precio típico",ok:false},{x:"Buscas el combo más común",ok:false}],
+  explica:"Mides si precio y calorías suben juntos: es una relación entre dos variables (covarianza/Pearson).",
+  trampa:"La mediana del precio no revela ninguna relación con las calorías.",
+  frase:"'¿Más de esto va con más de aquello?' → relación.",
+  concepto:"Tendencia conjunta de dos variables → covarianza/Pearson." });
+
+/* ===================== estado ===================== */
+let current = SCN[0].id;
+let pickLens = null;
+let pickWhy = null;
+let attempts = {};
+
+function curScn(){ return SCN.find(s=>s.id===current); }
+
+function pL(i){ if(done.has(current)) return; pickLens=(pickLens===i)?null:i; renderMain(); }
+function pW(i){ if(done.has(current)) return; pickWhy =(pickWhy===i)?null:i;  renderMain(); }
+function syncBtn(){
+  const b=document.getElementById("comprobar");
+  if(b) b.disabled = done.has(current) || pickLens===null || pickWhy===null;
+}
+
+function comprobar(){
+  const sc=curScn();
+  attempts[current]=(attempts[current]||0)+1;
+  const lensOk = pickLens!==null && sc.lentes[pickLens].ok;
+  const whyOk  = pickWhy !==null && sc.porques[pickWhy].ok;
+  const fb=document.getElementById("fb");
+  if(lensOk && whyOk){
+    done.add(current); anclas[current]=sc.frase; save();
+    reveal(sc);
+    renderProgress(); renderNav(); renderAnclas(); syncBtn();
+  } else if(!lensOk){
+    fb.className="fb show bad";
+    fb.innerHTML = `❌ Esa lente no responde lo que pide el escenario. Pregúntate primero: ¿te piden un <b>centro</b>, una <b>dispersión</b>, una <b>relación</b>, una <b>rareza</b> o una <b>probabilidad</b>?`;
+  } else {
+    fb.className="fb show info";
+    fb.innerHTML = `🟡 Lente correcta. Pero ese no es el motivo que la elige sobre su vecina. ¿Cuál es la <b>señal del escenario</b> que la decide?`;
+  }
+}
+
+function reveal(sc){
+  const fb=document.getElementById("fb");
+  fb.className="fb show good";
+  fb.innerHTML = `✅ <b>Correcto.</b>`
+    + `<div class="why">${esc(sc.explica)}</div>`
+    + `<div class="trampa">⚠ La vecina: ${esc(sc.trampa)}</div>`
+    + `<div class="frase">🪝 «${esc(sc.frase)}»</div>`
+    + `<div class="concepto">📎 ${esc(sc.concepto)}</div>`;
+}
+
+/* ===================== render ===================== */
+function renderProgress(){
+  document.getElementById("progtxt").textContent = `${done.size} / ${SCN.length}`;
+  document.getElementById("progbar").style.width = (done.size/SCN.length*100)+"%";
+}
+function renderAnclas(){
+  const c=document.getElementById("anclas");
+  const items=Object.values(anclas);
+  c.innerHTML = items.length ? items.map(f=>`<span class="pill">🪝 ${esc(f)}</span>`).join("")
+    : '<span class="footnote">Aún ninguna. Resuelve casos para coleccionarlas.</span>';
+}
+function renderNav(){
+  const nav=document.getElementById("nav");
+  nav.innerHTML = SCN.map((s,i)=>
+    `<button class="${s.id===current?'active':''}" onclick="goto('${s.id}')">`
+    + `${i+1}. ${esc(s.dom)}`
+    + `${done.has(s.id)?'<span class="done">✓</span>':''}</button>`
+  ).join("");
+}
+function renderMain(){
+  const sc=curScn();
+  const solved=done.has(sc.id);
+  const m=document.getElementById("main");
+  m.innerHTML = `
+    <span class="dom">${esc(sc.dom)}</span>
+    <h2>¿Qué lente uso aquí?</h2>
+    <div class="escena">${esc(sc.esc)}</div>
+
+    <div class="step">
+      <h3>1 · ¿Qué lente usarías?</h3>
+      <div class="opts">
+        ${sc.lentes.map((d,i)=>`<button class="${pickLens===i?'sel':''}" ${solved?'disabled':''} onclick="pL(${i})">${esc(d.x)}</button>`).join("")}
+      </div>
+    </div>
+
+    <div class="step">
+      <h3>2 · ¿Por qué ésa y no la vecina?</h3>
+      <div class="opts">
+        ${sc.porques.map((d,i)=>`<button class="${pickWhy===i?'sel':''}" ${solved?'disabled':''} onclick="pW(${i})">${esc(d.x)}</button>`).join("")}
+      </div>
+    </div>
+
+    <div style="display:flex;align-items:center">
+      <button class="act" id="comprobar" onclick="comprobar()">Comprobar ▶</button>
+      <span class="attempts">${solved?'✓ resuelto':'intentos: '+(attempts[sc.id]||0)}</span>
+    </div>
+    <div class="fb" id="fb"></div>`;
+  syncBtn();
+  if(solved) reveal(sc);
+}
+function goto(id){
+  current=id; pickLens=null; pickWhy=null;
+  renderNav(); renderMain();
+}
+function azar(){
+  const pend = SCN.filter(s=>!done.has(s.id));
+  const pool = pend.length ? pend : SCN;
+  // sin Math.random determinista: rota por intentos totales
+  const seed = Object.values(attempts).reduce((a,b)=>a+b,0) + done.size;
+  goto(pool[seed % pool.length].id);
+}
+document.getElementById("rand").addEventListener("click", azar);
+document.getElementById("reset").addEventListener("click",()=>{
+  if(!confirm("¿Borrar todo el progreso?")) return;
+  done=new Set(); anclas={}; save();
+  attempts={}; pickLens=null; pickWhy=null;
+  renderProgress(); renderNav(); renderAnclas(); renderMain();
+});
+
+/* ===================== arranque ===================== */
+renderProgress();
+renderAnclas();
+renderNav();
+renderMain();
+</script>
+</body>
+</html>
